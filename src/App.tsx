@@ -1,8 +1,11 @@
 import React from 'react';
+/** @jsx jsx */
+import { jsx, css } from '@emotion/core';
+
 import logo from './logo.svg';
 import './App.css';
 
-const App = () => (
+const App: React.FC = () => (
   <div className="App">
     <header className="App-header">
       <img src={logo} className="App-logo" alt="logo" />
@@ -21,6 +24,13 @@ const App = () => (
       >
         Learn React
       </a>
+      <p css={css`
+        color: #fff;
+        margin-top: 12px;
+      `}
+      >
+        task track
+      </p>
     </header>
   </div>
 );
