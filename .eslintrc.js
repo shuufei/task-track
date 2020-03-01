@@ -14,6 +14,7 @@ module.exports = {
     quotes: ['error', 'single'],
     semi: ['error', 'always'],
     indent: ['error', 2],
-    'no-console': ['error', { allow: ['warn', 'error', 'log'] }]
+    'no-console': ['error', { allow: ['warn', 'error', 'log'] }],
+    "import/no-extraneous-dependencies": ["error", {"dependencies": false, "devDependencies": false, "optionalDependencies": false, "peerDependencies": false}]
   }
 };
