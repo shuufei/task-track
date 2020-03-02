@@ -10,11 +10,7 @@ const App: React.FC = () => (
     <header className="App-header">
       <img src={logo} className="App-logo" alt="logo" />
       <p>
-        Edit
-        {' '}
-        <code>src/App.tsx</code>
-        {' '}
-        and save to reload.
+        Edit <code>src/App.tsx</code> and save to reload.
       </p>
       <a
         className="App-link"
@@ -24,10 +20,11 @@ const App: React.FC = () => (
       >
         Learn React
       </a>
-      <p css={css`
-        color: #fff;
-        margin-top: 12px;
-      `}
+      <p
+        css={css`
+          color: #fff;
+          margin-top: 12px;
+        `}
       >
         task track
       </p>
@@ -40,7 +37,7 @@ export default App;
 const buttonStyle = css`
   padding: 6px 12px;
   border-radius: 3px;
-`
+`;
 export const Button: React.FC<> = () => (
   <button css={buttonStyle}>button</button>
 );

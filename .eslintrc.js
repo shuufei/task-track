@@ -3,7 +3,7 @@ module.exports = {
   parser: '@typescript-eslint/parser',
   plugins: ['@typescript-eslint'],
   extends: [
-    'airbnb-typescript',
+    'airbnb-typescript'
     // 'prettier/@typescript-eslint',
   ],
   parserOptions: {
@@ -15,6 +15,14 @@ module.exports = {
     semi: ['error', 'always'],
     indent: ['error', 2],
     'no-console': ['error', { allow: ['warn', 'error', 'log'] }],
-    "import/no-extraneous-dependencies": ["error", {"dependencies": false, "devDependencies": false, "optionalDependencies": false, "peerDependencies": false}]
+    'import/no-extraneous-dependencies': [
+      'error',
+      {
+        dependencies: false,
+        devDependencies: false,
+        optionalDependencies: false,
+        peerDependencies: false
+      }
+    ]
   }
 };
