@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
 /** @jsx jsx */
 import { jsx, css } from '@emotion/core';
 
@@ -7,28 +7,7 @@ import './App.css';
 
 const App: React.FC = () => (
   <div className="App">
-    <header className="App-header">
-      <img src={logo} className="App-logo" alt="logo" />
-      <p>
-        Edit <code>src/App.tsx</code> and save to reload.
-      </p>
-      <a
-        className="App-link"
-        href="https://reactjs.org"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        Learn React
-      </a>
-      <p
-        css={css`
-          color: #fff;
-          margin-top: 12px;
-        `}
-      >
-        task track
-      </p>
-    </header>
+    <TextInputWithFocusButton />
   </div>
 );
 
@@ -39,3 +18,30 @@ const buttonStyle = css`
   border-radius: 3px;
 `;
 export const Button: React.FC = () => <button css={buttonStyle}>button</button>;
+
+export const TextInputWithFocusButton: React.FC = () => {
+  // const inputEl = useRef<HTMLInputElement>(null);
+  // const onButtonClick = () => {
+  //   console.log(inputEl);
+  //   inputEl?.current?.focus();
+  // };
+  const [inputRef, setInputRef] = useState<HTMLInputElement | null>(null);
+  const onButtonClick = () => {
+    inputRef?.focus();
+  };
+  return (
+    <React.Fragment>
+      {/* <input type="text" ref={inputEl} /> */}
+      <TextInput inputRef={el => setInputRef(el)} />
+      <button onClick={onButtonClick}>Focus the input</button>
+    </React.Fragment>
+  );
+};
+
+type TextInputPros = {
+  inputRef: (el: HTMLInputElement) => void;
+};
+
+export const TextInput: React.FC<TextInputPros> = ({ inputRef }) => {
+  return <input type="text" ref={inputRef} />;
+};
