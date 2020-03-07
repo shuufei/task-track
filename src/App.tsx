@@ -2,34 +2,44 @@ import React from 'react';
 /** @jsx jsx */
 import { jsx, css } from '@emotion/core';
 
-import logo from './logo.svg';
 import './App.css';
+import {
+  Link,
+  Switch,
+  BrowserRouter as Router,
+  Route,
+  Redirect
+} from 'react-router-dom';
+import { TasksPage } from './pages/TasksPage';
+import { ReportPage } from './pages/ReportPage';
 
 const App: React.FC = () => (
-  <div className="App">
-    <header className="App-header">
-      <img src={logo} className="App-logo" alt="logo" />
-      <p>
-        Edit <code>src/App.tsx</code> and save to reload.
-      </p>
-      <a
-        className="App-link"
-        href="https://reactjs.org"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        Learn React
-      </a>
-      <p
-        css={css`
-          color: #fff;
-          margin-top: 12px;
-        `}
-      >
-        task track
-      </p>
-    </header>
-  </div>
+  <Router>
+    <div>
+      <nav>
+        <ul>
+          <li>
+            <Link to="/tasks">Tasks</Link>
+          </li>
+          <li>
+            <Link to="/report">Report</Link>
+          </li>
+        </ul>
+      </nav>
+    </div>
+
+    <Switch>
+      <Route path="/tasks">
+        <TasksPage />
+      </Route>
+      <Route path="/report">
+        <ReportPage />
+      </Route>
+      <Route path="/">
+        <Redirect to={{ pathname: '/tasks' }} />
+      </Route>
+    </Switch>
+  </Router>
 );
 
 export default App;
