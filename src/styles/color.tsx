@@ -7,6 +7,7 @@ export const colors = {
   black300: '#777777',
   black350: '#A0A0A0',
   black200: '#CCCCCC',
+  black80: '#F0F0F0',
   black50: '#FAFAFA',
   white: '#ffffff'
 };

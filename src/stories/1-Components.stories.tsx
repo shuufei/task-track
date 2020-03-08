@@ -6,6 +6,7 @@ import { action } from '@storybook/addon-actions';
 import { TextField } from 'components/TextField';
 import { Checkbox } from 'components/Checkbox';
 import { Icon } from 'components/Icon';
+import { TimeField } from 'components/TimeField';
 
 export default {
   title: 'Components'
@@ -23,7 +24,19 @@ const ComponentWrap: React.FC = ({ children }) => (
 
 export const _TextField = () => (
   <ComponentWrap>
-    <TextField />
+    <TextField
+      css={css`
+        display: block;
+        margin: 12px;
+      `}
+      placeholder={'タスク名を入力'}
+    />
+    <TextField
+      css={css`
+        display: block;
+        margin: 12px;
+      `}
+    />
   </ComponentWrap>
 );
 
@@ -101,5 +114,11 @@ export const _Icons = () => (
         `}
       ></Icon>
     </div>
+  </ComponentWrap>
+);
+
+export const _TimeField = () => (
+  <ComponentWrap>
+    <TimeField timeSec={360 * 2} />
   </ComponentWrap>
 );
