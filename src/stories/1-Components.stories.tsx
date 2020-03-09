@@ -7,18 +7,20 @@ import { TextField } from 'components/TextField';
 import { Checkbox } from 'components/Checkbox';
 import { Icon } from 'components/Icon';
 import { TimeField } from 'components/TimeField';
+import { TimeControl } from 'components/TimeControl';
 
 export default {
   title: 'Components'
 };
 
-const ComponentWrap: React.FC = ({ children }) => (
+const ComponentWrap: React.FC = props => (
   <div
     css={css`
       padding: 12px;
     `}
+    {...props}
   >
-    {children}
+    {props.children}
   </div>
 );
 
@@ -119,6 +121,23 @@ export const _Icons = () => (
 
 export const _TimeField = () => (
   <ComponentWrap>
-    <TimeField timeSec={360 * 2} />
+    <TimeField timesec={3600 * 2 + 99} />
   </ComponentWrap>
 );
+
+export const _TimeControl = () => {
+  const [timeSec, setTimeSec] = useState(7200);
+  return (
+    <ComponentWrap
+      css={css`
+        padding-left: 120px;
+      `}
+    >
+      <TimeControl
+        timesec={timeSec}
+        addSec={(sec, current) => setTimeSec(current + sec)}
+        subtractSec={(sec, current) => setTimeSec(current - sec)}
+      />
+    </ComponentWrap>
+  );
+};

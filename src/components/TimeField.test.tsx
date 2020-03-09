@@ -21,8 +21,8 @@ describe('秒からHH:mm:ssへの変換処理', () => {
     expect(actual).toBe('00:00:00');
   });
 
-  test('指定された値が表示できる最大値より大きい時、99:59:59になる', () => {
+  test('指定された値が表示できる最大値より大きい時、24:59:59になる', () => {
     const actual = convertToTimeFormatFromSec(10000000000);
-    expect(actual).toBe('99:59:59');
+    expect(actual).toBe('23:59:59');
   });
 });

@@ -17,7 +17,7 @@ export const Checkbox: React.FC<Props> = ({ isChecked = false, onToggle }) => {
           content: '';
           position: absolute;
           display: inline-block;
-          left: 5px;
+          left: 4.5px;
           top: 0;
           width: 5px;
           height: 10px;
