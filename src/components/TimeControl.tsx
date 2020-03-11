@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState, useRef } from 'react';
 /** @jsx jsx */
-import { jsx, css } from '@emotion/core';
+import { jsx, css, keyframes } from '@emotion/core';
 
 import { colors } from 'styles/color';
 import { shadow } from 'styles/shadow';
@@ -22,6 +22,39 @@ const buttonStyle = css`
   }
 `;
 
+const fadeIn = keyframes`
+  0% {
+    visibility: hidden;
+    opacity: 0;
+  }
+  1% {
+    opacity: 0;
+    transform: translateY(-2px);
+  }
+  100% {
+    visibility: visible;
+    opacity: 1;
+    transform: translateY(0);
+  }
+`;
+
+const fadeOut = keyframes`
+  0% {
+    visibility: visible;
+    opacity: 1;
+    transform: translateY(0);
+  }
+  99% {
+    opacity: 0;
+    transform: translateY(-2px);
+  }
+  100% {
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(-2px);
+  }
+`;
+
 export type Props = {
   timesec: number;
   addSec: (sec: number, currentSec: number) => void;
@@ -29,8 +62,29 @@ export type Props = {
 };
 
 export const TimeControl: React.FC<Props> = props => {
+  const [isShown, setIsShown] = useState<boolean | null>(null);
+  const popupRef = useRef<HTMLDivElement>(null);
+  const documentClickHandler = (event: MouseEvent) => {
+    if (popupRef.current?.contains(event.target as Node)) {
+      return;
+    }
+    setIsShown(false);
+    removeDocumentClickHandler();
+  };
+
+  const removeDocumentClickHandler = () => {
+    document.removeEventListener('click', documentClickHandler);
+  };
+
+  const handleToggleButtonClick = () => {
+    if (isShown) {
+      return;
+    }
+    setIsShown(true);
+    document.addEventListener('click', documentClickHandler);
+  };
+
   const add = (sec: number) => {
-    console.log('-- add ', sec, props.timesec);
     const after = sec + props.timesec;
     if (after >= MAX_SEC) {
       props.addSec(0, MAX_SEC);
@@ -39,7 +93,6 @@ export const TimeControl: React.FC<Props> = props => {
     }
   };
   const subtract = (sec: number) => {
-    console.log('-- subtract ', sec, props.timesec);
     const after = props.timesec - sec;
     if (after <= MIN_SEC) {
       props.subtractSec(0, MIN_SEC);
@@ -53,18 +106,23 @@ export const TimeControl: React.FC<Props> = props => {
         display: inline-block;
         position: relative;
       `}
+      onClick={handleToggleButtonClick}
+      ref={popupRef}
     >
       <TimeField timesec={props.timesec} />
       <div
         css={css`
           position: absolute;
           top: calc(100% + 4px);
-          right: -6px;
+          right: -4px;
           background-color: ${colors.black100};
           padding: 10px 12px;
           border-radius: 3px;
-          display: flex;
           ${shadow};
+          display: flex;
+          visibility: ${isShown ? 'visible' : 'hidden'};
+          animation: ${isShown == null ? '' : isShown ? fadeIn : fadeOut} 0.2s
+            ease-out forwards;
         `}
       >
         <div

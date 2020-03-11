@@ -60,6 +60,8 @@ export const TimeField: React.FC<Props> = props => {
         }
         :focus {
           outline: none;
+        }
+        :hover {
           background-color: ${colors.black200};
         }
       `}
