@@ -8,6 +8,7 @@ import { Checkbox } from 'components/Checkbox';
 import { Icon } from 'components/Icon';
 import { TimeField } from 'components/TimeField';
 import { TimeControl } from 'components/TimeControl';
+import { TimeControlPanel } from 'components/TImeControlPanel';
 
 export default {
   title: 'Components'
@@ -124,6 +125,19 @@ export const _TimeField = () => (
     <TimeField timesec={3600 * 2 + 99} />
   </ComponentWrap>
 );
+
+export const _TimeControlPanel = () => {
+  const [timeSec, setTimeSec] = useState(7200);
+  return (
+    <ComponentWrap>
+      <TimeControlPanel
+        timesec={timeSec}
+        addSec={(sec, current) => setTimeSec(current + sec)}
+        subtractSec={(sec, current) => setTimeSec(current - sec)}
+      />
+    </ComponentWrap>
+  );
+};
 
 export const _TimeControl = () => {
   const [timeSec, setTimeSec] = useState(7200);
