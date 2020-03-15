@@ -8,6 +8,7 @@ export type Props = {
   popupTriger: JSX.Element;
   popup: JSX.Element;
   keep?: boolean;
+  position?: 'right' | 'left';
 };
 
 export const PopupContainer: React.FC<Props> = props => {
@@ -50,9 +51,9 @@ export const PopupContainer: React.FC<Props> = props => {
         css={css`
           position: absolute;
           top: calc(100% + 4px);
-          right: -4px;
           display: inline-block;
           ${shadow};
+          ${props.position === 'left' ? leftPositiong : rightPosition};
           visibility: ${isShown ? 'visible' : 'hidden'};
           animation: ${isShown == null ? '' : isShown ? fadeIn : fadeOut} 0.2s
             ease-out forwards;
@@ -95,4 +96,12 @@ const fadeOut = keyframes`
     opacity: 0;
     transform: translateY(-2px);
   }
+`;
+
+const rightPosition = css`
+  right: -4px;
+`;
+
+const leftPositiong = css`
+  left: -4px;
 `;

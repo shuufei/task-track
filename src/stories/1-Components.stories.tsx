@@ -9,6 +9,9 @@ import { Icon } from 'components/Icon';
 import { TimeField } from 'components/TimeField';
 import { TimeControl } from 'components/TimeControl';
 import { TimeControlPanel } from 'components/TImeControlPanel';
+import { Menu } from 'components/Menu';
+import { Comment } from 'components/Comment';
+import { Textarea } from 'components/Textarea';
 
 export default {
   title: 'Components'
@@ -32,7 +35,7 @@ export const _TextField = () => (
         display: block;
         margin: 12px;
       `}
-      placeholder={'タスク名を入力'}
+      placeholder={'Input Task'}
     />
     <TextField
       css={css`
@@ -62,26 +65,26 @@ export const _Icons = () => (
   <ComponentWrap>
     <div>
       <Icon
-        iconName={'play'}
+        iconname={'play'}
         css={css`
           margin: 12px;
         `}
       ></Icon>
       <Icon
-        iconName={'pause'}
+        iconname={'pause'}
         css={css`
           margin: 12px;
         `}
       ></Icon>
       <Icon
-        iconName={'close'}
+        iconname={'close'}
         css={css`
           width: 20px;
           margin: 12px;
         `}
       ></Icon>
       <Icon
-        iconName={'menu'}
+        iconname={'menu'}
         css={css`
           margin: 12px;
         `}
@@ -89,28 +92,28 @@ export const _Icons = () => (
     </div>
     <div>
       <Icon
-        iconName={'play'}
+        iconname={'play'}
         css={css`
           width: 20px;
           margin: 12px;
         `}
       ></Icon>
       <Icon
-        iconName={'pause'}
+        iconname={'pause'}
         css={css`
           width: 20px;
           margin: 12px;
         `}
       ></Icon>
       <Icon
-        iconName={'close'}
+        iconname={'close'}
         css={css`
           width: 20px;
           margin: 12px;
         `}
       ></Icon>
       <Icon
-        iconName={'menu'}
+        iconname={'menu'}
         css={css`
           width: 20px;
           margin: 12px;
@@ -154,4 +157,26 @@ export const _TimeControl = () => {
       />
     </ComponentWrap>
   );
+};
+
+export const _Menu = () => {
+  const addComments = () => action('add comment');
+  const deleteTask = () => action('delete');
+  return (
+    <ComponentWrap>
+      <Menu addComment={() => addComments} delete={() => deleteTask()} />
+    </ComponentWrap>
+  );
+};
+
+export const _Comment = () => {
+  return (
+    <ComponentWrap>
+      <Comment delete={() => action('comment delete')} />
+    </ComponentWrap>
+  );
+};
+
+export const _Textarea = () => {
+  return <Textarea />;
 };

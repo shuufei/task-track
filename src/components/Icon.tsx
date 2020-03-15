@@ -8,9 +8,9 @@ export const ICONS = {
 };
 
 export type Props = {
-  iconName: keyof typeof ICONS;
+  iconname: keyof typeof ICONS;
 };
 
 export const Icon: React.FC<Props> = props => (
-  <img src={ICONS[props.iconName]} alt={props.iconName} {...props} />
+  <img src={ICONS[props.iconname]} alt={props.iconname} {...props} />
 );
