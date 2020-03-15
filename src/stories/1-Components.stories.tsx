@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 /** @jsx jsx */
 import { jsx, css } from '@emotion/core';
 import { action } from '@storybook/addon-actions';
@@ -8,10 +8,12 @@ import { Checkbox } from 'components/Checkbox';
 import { Icon } from 'components/Icon';
 import { TimeField } from 'components/TimeField';
 import { TimeControl } from 'components/TimeControl';
-import { TimeControlPanel } from 'components/TImeControlPanel';
+import { TimeControlPanel } from 'components/TimeControlPanel';
 import { Menu } from 'components/Menu';
 import { Comment } from 'components/Comment';
 import { Textarea } from 'components/Textarea';
+import { Task as TaskComponent } from 'components/Task';
+import { Task } from 'model/task';
 
 export default {
   title: 'Components'
@@ -179,4 +181,71 @@ export const _Comment = () => {
 
 export const _Textarea = () => {
   return <Textarea />;
+};
+
+export const _Task = () => {
+  const initialTask: Task = {
+    uuid: '0001',
+    title: '',
+    isDone: false,
+    timesec: 0,
+    isPlaying: false,
+    startUnixtime: 0
+  };
+  const [task, setTask] = useState(initialTask);
+  const setTimesec = (sec: number) => {
+    setTask({
+      ...task,
+      timesec: sec
+    });
+  };
+  const setIsDone = (isDone: boolean) => {
+    setTask({
+      ...task,
+      isDone: isDone,
+      isPlaying: false
+    });
+  };
+  const setIsPlaying = (isPlaying: boolean) => {
+    setTask({
+      ...task,
+      isPlaying: isPlaying
+    });
+  };
+  const setTitle = (title: string) => {
+    setTask({
+      ...task,
+      title
+    });
+  };
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (task.isPlaying) {
+        setTask({
+          ...task,
+          timesec: task.timesec + 1
+        });
+      }
+    }, 1000);
+    return () => {
+      clearInterval(interval);
+    };
+  }, [task]);
+  return (
+    <TaskComponent
+      title={task.title}
+      timesec={task.timesec}
+      isDone={task.isDone}
+      isPlaying={task.isPlaying}
+      addSec={(sec, current) => setTimesec(current + sec)}
+      subtractSec={(sec, current) => setTimesec(current - sec)}
+      done={isDone => setIsDone(isDone)}
+      play={() => setIsPlaying(true)}
+      pause={() => setIsPlaying(false)}
+      editTitle={value => setTitle(value)}
+      addComment={() => {}}
+      editComments={() => {}}
+      delete={() => {}}
+    />
+  );
 };

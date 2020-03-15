@@ -9,18 +9,19 @@ export type Props = {
   onToggle: (isCheck: boolean) => void;
 };
 
-export const Checkbox: React.FC<Props> = ({ isChecked = false, onToggle }) => {
-  const checkmarkStyle = isChecked
+export const Checkbox: React.FC<Props> = props => {
+  const SIZE = '14px';
+  const checkmarkStyle = props.isChecked
     ? css`
         background-color: ${colors.green500};
         :after {
           content: '';
           position: absolute;
           display: inline-block;
-          left: 4.5px;
-          top: 0;
-          width: 5px;
-          height: 10px;
+          left: 4px;
+          top: 1;
+          width: 4px;
+          height: 7px;
           border: solid ${colors.white};
           border-width: 0 2px 2px 0;
           transform: rotate(45deg);
@@ -33,11 +34,11 @@ export const Checkbox: React.FC<Props> = ({ isChecked = false, onToggle }) => {
     <label
       css={css`
         display: inline-block;
+        line-height: 0;
         position: relative;
         cursor: pointer;
-        height: 16px;
-        width: 16px;
       `}
+      {...props}
     >
       <input
         type="checkbox"
@@ -46,20 +47,21 @@ export const Checkbox: React.FC<Props> = ({ isChecked = false, onToggle }) => {
           opacity: 0;
           height: 0;
           width: 0;
+          visibility: hidden;
         `}
       />
       <span
         css={css`
-          position: absolute;
-          top: 0;
-          left: 0;
-          height: 100%;
-          width: 100%;
+          height: ${SIZE};
+          width: ${SIZE};
+          display: inline-block;
+          line-height: 0;
           border: solid 1px ${colors.black200};
           border-radius: 3px;
+          box-sizing: border-box;
           ${checkmarkStyle};
         `}
-        onClick={() => onToggle(!isChecked)}
+        onClick={() => props.onToggle(!props.isChecked)}
       ></span>
     </label>
   );

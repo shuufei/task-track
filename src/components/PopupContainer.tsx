@@ -41,6 +41,7 @@ export const PopupContainer: React.FC<Props> = props => {
     <div
       css={css`
         display: inline-block;
+        line-height: 0;
         position: relative;
       `}
       onClick={handleToggleButtonClick}

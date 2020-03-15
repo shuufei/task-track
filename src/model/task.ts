@@ -1,6 +1,8 @@
 export type Task = {
   uuid: string;
-  name: string;
+  title: string;
   isDone: boolean;
   timesec: number;
+  isPlaying: boolean;
+  startUnixtime: number;
 };

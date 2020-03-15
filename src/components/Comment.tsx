@@ -4,7 +4,7 @@ import { jsx, css } from '@emotion/core';
 
 import { Icon } from './Icon';
 import { colors } from 'styles/color';
-import { Textarea } from './Textarea';
+import { Textarea, AdjustHeightToTextarea } from './Textarea';
 
 export type Props = {
   delete: () => void;
@@ -15,26 +15,27 @@ export const Comment: React.FC<Props> = props => {
     <div
       css={css`
         display: flex;
-        align-items: center;
+        align-items: flex-start;
       `}
     >
-      <span
-        css={css`
-          width: 5px;
-          height: 5px;
-          background-color: ${colors.black400};
-          border-radius: 50%;
-        `}
-      ></span>
+      <AdjustHeightToTextarea>
+        <span
+          css={css`
+            width: 5px;
+            height: 5px;
+            background-color: ${colors.black400};
+            border-radius: 50%;
+          `}
+        ></span>
+      </AdjustHeightToTextarea>
       <Textarea
         placeholder={'Edit Comment'}
         css={css`
           margin-left: 4px;
         `}
       />
-      <div
+      <AdjustHeightToTextarea
         css={css`
-          display: inline-block;
           cursor: pointer;
         `}
         onClick={() => props.delete()}
@@ -45,7 +46,7 @@ export const Comment: React.FC<Props> = props => {
             margin-left: 12px;
           `}
         />
-      </div>
+      </AdjustHeightToTextarea>
     </div>
   );
 };

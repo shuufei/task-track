@@ -17,6 +17,8 @@ export const Menu: React.FC<Props> = props => {
       iconname={'menu'}
       css={css`
         cursor: pointer;
+        display: inline-block;
+        line-height: 0;
       `}
     />
   );

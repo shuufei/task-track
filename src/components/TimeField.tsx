@@ -57,6 +57,7 @@ export const TimeField: React.FC<Props> = props => {
         ::-webkit-datetime-edit-minute-field:focus,
         ::-webkit-datetime-edit-second-field:focus {
           background-color: unset;
+          color: inherit;
         }
         :focus {
           outline: none;
