@@ -59,7 +59,7 @@ export const Comment: React.FC<Props> = props => {
       >
         <Icon
           iconname={'close'}
-          css={css`
+          customCss={css`
             margin-left: 12px;
             visibility: ${isHover ? 'visible' : 'hidden'};
           `}

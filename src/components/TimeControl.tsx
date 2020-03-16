@@ -28,7 +28,7 @@ export const TimeControl: React.FC<Props> = props => {
       `
     : css``;
   const timeFieldRender = () => (
-    <TimeField timesec={props.timesec} css={timeFieldStyles} />
+    <TimeField timesec={props.timesec} customCss={timeFieldStyles} />
   );
   const timeControlPanelRender = () => <TimeControlPanel {...props} />;
   return (

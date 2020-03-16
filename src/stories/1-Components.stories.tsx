@@ -24,7 +24,6 @@ const ComponentWrap: React.FC = props => (
     css={css`
       padding: 12px;
     `}
-    {...props}
   >
     {props.children}
   </div>
@@ -33,14 +32,14 @@ const ComponentWrap: React.FC = props => (
 export const _TextField = () => (
   <ComponentWrap>
     <TextField
-      css={css`
+      customCss={css`
         display: block;
         margin: 12px;
       `}
       placeholder={'Input Task'}
     />
     <TextField
-      css={css`
+      customCss={css`
         display: block;
         margin: 12px;
       `}
@@ -68,26 +67,26 @@ export const _Icons = () => (
     <div>
       <Icon
         iconname={'play'}
-        css={css`
+        customCss={css`
           margin: 12px;
         `}
       ></Icon>
       <Icon
         iconname={'pause'}
-        css={css`
+        customCss={css`
           margin: 12px;
         `}
       ></Icon>
       <Icon
         iconname={'close'}
-        css={css`
+        customCss={css`
           width: 20px;
           margin: 12px;
         `}
       ></Icon>
       <Icon
         iconname={'menu'}
-        css={css`
+        customCss={css`
           margin: 12px;
         `}
       ></Icon>
@@ -95,28 +94,28 @@ export const _Icons = () => (
     <div>
       <Icon
         iconname={'play'}
-        css={css`
+        customCss={css`
           width: 20px;
           margin: 12px;
         `}
       ></Icon>
       <Icon
         iconname={'pause'}
-        css={css`
+        customCss={css`
           width: 20px;
           margin: 12px;
         `}
       ></Icon>
       <Icon
         iconname={'close'}
-        css={css`
+        customCss={css`
           width: 20px;
           margin: 12px;
         `}
       ></Icon>
       <Icon
         iconname={'menu'}
-        css={css`
+        customCss={css`
           width: 20px;
           margin: 12px;
         `}

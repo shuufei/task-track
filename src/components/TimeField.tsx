@@ -1,6 +1,6 @@
 import React from 'react';
 /** @jsx jsx */
-import { jsx, css } from '@emotion/core';
+import { jsx, css, SerializedStyles } from '@emotion/core';
 
 import * as typography from 'styles/typography';
 import { colors } from 'styles/color';
@@ -30,6 +30,7 @@ export const convertToTimeFormatFromSec = (timeSec: number) => {
 
 export type Props = {
   timesec: number;
+  customCss?: SerializedStyles;
 };
 
 export const TimeField: React.FC<Props> = props => {
@@ -65,8 +66,8 @@ export const TimeField: React.FC<Props> = props => {
         :hover {
           background-color: ${colors.black200};
         }
+        ${props.customCss}
       `}
-      {...props}
     />
   );
 };

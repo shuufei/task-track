@@ -80,7 +80,7 @@ export const Task: React.FC<Props> = props => {
             onToggle={() => {
               props.done(!props.isDone);
             }}
-            css={css`
+            customCss={css`
               margin-left: 10px;
             `}
           />
@@ -117,7 +117,7 @@ export const Task: React.FC<Props> = props => {
         >
           <Icon
             iconname={!props.isPlaying ? 'play' : 'pause'}
-            css={css`
+            customCss={css`
               cursor: pointer;
               width: 12px;
               margin-left: 12px;

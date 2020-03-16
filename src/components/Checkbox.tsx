@@ -1,12 +1,13 @@
 import React from 'react';
 /** @jsx jsx */
-import { jsx, css } from '@emotion/core';
+import { jsx, css, SerializedStyles } from '@emotion/core';
 
 import { colors } from 'styles/color';
 
 export type Props = {
   isChecked?: boolean;
   onToggle: (isCheck: boolean) => void;
+  customCss?: SerializedStyles;
 };
 
 export const Checkbox: React.FC<Props> = props => {
@@ -37,8 +38,8 @@ export const Checkbox: React.FC<Props> = props => {
         line-height: 0;
         position: relative;
         cursor: pointer;
+        ${props.customCss};
       `}
-      {...props}
     >
       <input
         type="checkbox"

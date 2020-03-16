@@ -15,7 +15,7 @@ export const Menu: React.FC<Props> = props => {
   const menuIconRender = () => (
     <Icon
       iconname={'menu'}
-      css={css`
+      customCss={css`
         cursor: pointer;
         display: inline-block;
         line-height: 0;

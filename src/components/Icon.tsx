@@ -1,4 +1,6 @@
 import React from 'react';
+/** @jsx jsx */
+import { jsx, SerializedStyles } from '@emotion/core';
 
 export const ICONS = {
   play: 'icons/play.svg',
@@ -9,8 +11,9 @@ export const ICONS = {
 
 export type Props = {
   iconname: keyof typeof ICONS;
+  customCss?: SerializedStyles;
 };
 
 export const Icon: React.FC<Props> = props => (
-  <img src={ICONS[props.iconname]} alt={props.iconname} {...props} />
+  <img src={ICONS[props.iconname]} alt={props.iconname} css={props.customCss} />
 );
