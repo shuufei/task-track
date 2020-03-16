@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 /** @jsx jsx */
 import { jsx, css } from '@emotion/core';
 
@@ -29,7 +29,6 @@ export type Props = {
 };
 
 export const Task: React.FC<Props> = props => {
-  const [isHover, setIsHover] = useState(false);
   const deleteComment = (index: number) => {
     const comments = [...props.comments];
     comments.splice(index, 1);
@@ -55,8 +54,6 @@ export const Task: React.FC<Props> = props => {
           ${props.isPlaying ? colors.primary500 : 'rgba(0,0,0,0)'};
         ${shadow}
       `}
-      onMouseEnter={() => setIsHover(true)}
-      onMouseLeave={() => setIsHover(false)}
     >
       <div
         css={css`
@@ -64,11 +61,7 @@ export const Task: React.FC<Props> = props => {
           align-items: flex-start;
         `}
       >
-        <AdjustHeightToTextarea
-          css={css`
-            opacity: ${isHover ? 1 : 0.4};
-          `}
-        >
+        <AdjustHeightToTextarea>
           <Menu
             addComment={() => addComment(props.comments.length)}
             delete={() => {}}
