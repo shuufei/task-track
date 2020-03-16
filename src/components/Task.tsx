@@ -35,8 +35,10 @@ export const Task: React.FC<Props> = props => {
     comments.splice(index, 1);
     props.editComments([...comments]);
   };
-  const addComment = () => {
-    props.editComments([...props.comments, '']);
+  const addComment = (index: number) => {
+    const comments = [...props.comments];
+    comments.splice(index, 0, '');
+    props.editComments([...comments]);
   };
   const editComment = (comment: string, index: number) => {
     const comments = [...props.comments];
@@ -67,7 +69,10 @@ export const Task: React.FC<Props> = props => {
             opacity: ${isHover ? 1 : 0.4};
           `}
         >
-          <Menu addComment={() => addComment()} delete={() => {}} />
+          <Menu
+            addComment={() => addComment(props.comments.length)}
+            delete={() => {}}
+          />
         </AdjustHeightToTextarea>
         <AdjustHeightToTextarea>
           <Checkbox
@@ -84,7 +89,7 @@ export const Task: React.FC<Props> = props => {
           placeholder={'Input Task'}
           value={props.title}
           changeValue={value => props.editTitle(value)}
-          css={css`
+          customCss={css`
             margin-left: 6px;
             text-decoration: ${props.isDone ? 'line-through' : 'unset'};
             color: ${props.isDone ? colors.black350 : colors.black500};
@@ -147,6 +152,7 @@ export const Task: React.FC<Props> = props => {
                   comment={comment}
                   editComment={comment => editComment(comment, i)}
                   delete={() => deleteComment(i)}
+                  onPressEnter={() => addComment(i + 1)}
                 />
               </div>
             ))}

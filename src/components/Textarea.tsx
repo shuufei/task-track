@@ -1,16 +1,22 @@
 import React, { useRef, useState } from 'react';
 /** @jsx jsx */
-import { jsx, css } from '@emotion/core';
+import { jsx, css, SerializedStyles } from '@emotion/core';
 
 import { colors } from 'styles/color';
 import * as typography from 'styles/typography';
 
 export const INITIAL_HEIGHT = '27px';
 
+export type Key = 'Enter' | 'Tab' | 'Backspace';
+
 export type Props = {
+  customCss?: SerializedStyles;
   placeholder?: string;
   value?: string;
   changeValue?: (value: string) => void;
+  onPressEnter?: () => void;
+  onPressTab?: () => void;
+  onPressDelete?: (prevValue: string) => void;
 };
 
 export const Textarea: React.FC<Props> = props => {
@@ -22,6 +28,33 @@ export const Textarea: React.FC<Props> = props => {
     }
     ref.current.style.height = 'auto';
     ref.current.style.height = `${ref.current.scrollHeight}px`;
+  };
+  const onKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    switch (event.key as Key) {
+      case 'Enter':
+        if (event.shiftKey || props.onPressEnter == null) {
+          return;
+        }
+        event.preventDefault();
+        props.onPressEnter();
+        break;
+      case 'Tab':
+        if (props.onPressTab == null) {
+          return;
+        }
+        event.preventDefault();
+        props.onPressTab();
+        break;
+      case 'Backspace':
+        const prevValue = (event.target as any).value;
+        if (props.onPressDelete == null) {
+          return;
+        }
+        props.onPressDelete(prevValue);
+        break;
+      default:
+        break;
+    }
   };
   return (
     <textarea
@@ -46,9 +79,11 @@ export const Textarea: React.FC<Props> = props => {
           outline: none;
           background-color: ${colors.black80};
         }
+        ${props.customCss}
       `}
-      {...props}
+      placeholder={props.placeholder}
       rows={1}
+      onKeyDown={event => onKeyDown(event)}
     />
   );
 };
