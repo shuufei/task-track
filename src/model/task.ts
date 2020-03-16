@@ -5,4 +5,5 @@ export type Task = {
   timesec: number;
   isPlaying: boolean;
   startUnixtime: number;
+  comments: string[];
 };

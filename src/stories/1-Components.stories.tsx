@@ -172,9 +172,14 @@ export const _Menu = () => {
 };
 
 export const _Comment = () => {
+  const [comment, setComment] = useState('');
   return (
     <ComponentWrap>
-      <Comment delete={() => action('comment delete')} />
+      <Comment
+        comment={comment}
+        editComment={v => setComment(v)}
+        delete={() => action('comment delete')}
+      />
     </ComponentWrap>
   );
 };
@@ -190,7 +195,8 @@ export const _Task = () => {
     isDone: false,
     timesec: 0,
     isPlaying: false,
-    startUnixtime: 0
+    startUnixtime: 0,
+    comments: []
   };
   const [task, setTask] = useState(initialTask);
   const setTimesec = (sec: number) => {
@@ -218,6 +224,12 @@ export const _Task = () => {
       title
     });
   };
+  const setComments = (comments: string[]) => {
+    setTask({
+      ...task,
+      comments
+    });
+  };
   useEffect(() => {
     const interval = setInterval(() => {
       if (task.isPlaying) {
@@ -237,6 +249,7 @@ export const _Task = () => {
       timesec={task.timesec}
       isDone={task.isDone}
       isPlaying={task.isPlaying}
+      comments={task.comments}
       addSec={(sec, current) => setTimesec(current + sec)}
       subtractSec={(sec, current) => setTimesec(current - sec)}
       done={isDone => setIsDone(isDone)}
@@ -244,7 +257,7 @@ export const _Task = () => {
       pause={() => setIsPlaying(false)}
       editTitle={value => setTitle(value)}
       addComment={() => {}}
-      editComments={() => {}}
+      editComments={comments => setComments(comments)}
       delete={() => {}}
     />
   );
