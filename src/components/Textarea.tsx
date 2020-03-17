@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 /** @jsx jsx */
 import { jsx, css, SerializedStyles } from '@emotion/core';
 
@@ -30,6 +30,9 @@ export const Textarea: React.FC<Props> = props => {
     ref.current.style.height = 'auto';
     ref.current.style.height = `${ref.current.scrollHeight}px`;
   };
+  useEffect(() => {
+    adjustHeight();
+  });
   const onKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
     switch (event.key as Key) {
       case 'Enter':
