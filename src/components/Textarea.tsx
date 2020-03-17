@@ -6,6 +6,7 @@ import { colors } from 'styles/color';
 import * as typography from 'styles/typography';
 
 export const INITIAL_HEIGHT = '27px';
+const IME_ENTER_KEY_CODE = 229;
 
 export type Key = 'Enter' | 'Tab' | 'Backspace';
 
@@ -32,7 +33,11 @@ export const Textarea: React.FC<Props> = props => {
   const onKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
     switch (event.key as Key) {
       case 'Enter':
-        if (event.shiftKey || props.onPressEnter == null) {
+        if (
+          event.shiftKey ||
+          event.keyCode === IME_ENTER_KEY_CODE ||
+          props.onPressEnter == null
+        ) {
           return;
         }
         event.preventDefault();
