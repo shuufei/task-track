@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 /** @jsx jsx */
 import { jsx, css } from '@emotion/core';
 
@@ -29,20 +29,36 @@ export type Props = {
 };
 
 export const Task: React.FC<Props> = props => {
+  const [focusCommentIndex, setFocusCommentIndex] = useState<number | null>(
+    null
+  );
   const deleteComment = (index: number) => {
     const comments = [...props.comments];
     comments.splice(index, 1);
     props.editComments([...comments]);
+    setFocusCommentIndex(index === 0 ? 0 : index - 1);
   };
   const addComment = (index: number) => {
     const comments = [...props.comments];
     comments.splice(index, 0, '');
     props.editComments([...comments]);
+    setFocusCommentIndex(index);
   };
   const editComment = (comment: string, index: number) => {
     const comments = [...props.comments];
     comments[index] = comment;
     props.editComments([...comments]);
+    setFocusCommentIndex(index);
+  };
+  const focusPrevComment = (currentIndex: number) => {
+    setFocusCommentIndex(currentIndex === 0 ? 0 : currentIndex - 1);
+  };
+  const focusNextComment = (currentIndex: number) => {
+    setFocusCommentIndex(
+      currentIndex === props.comments.length - 1
+        ? currentIndex
+        : currentIndex + 1
+    );
   };
   return (
     <div
@@ -146,6 +162,9 @@ export const Task: React.FC<Props> = props => {
                   editComment={comment => editComment(comment, i)}
                   delete={() => deleteComment(i)}
                   onPressEnter={() => addComment(i + 1)}
+                  onPressArrowUp={() => focusPrevComment(i)}
+                  onPressArrowDown={() => focusNextComment(i)}
+                  focus={i === focusCommentIndex}
                 />
               </div>
             ))}

@@ -1,20 +1,29 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 /** @jsx jsx */
 import { jsx, css } from '@emotion/core';
 
 import { Icon } from './Icon';
 import { colors } from 'styles/color';
-import { Textarea, AdjustHeightToTextarea } from './Textarea';
+import { Textarea, AdjustHeightToTextarea, Handler } from './Textarea';
 
 export type Props = {
   comment: string;
   editComment: (comment: string) => void;
   delete: () => void;
   onPressEnter?: () => void;
+  onPressArrowUp?: () => void;
+  onPressArrowDown?: () => void;
+  focus?: boolean;
 };
 
 export const Comment: React.FC<Props> = props => {
   const [isHover, setIsHover] = useState(false);
+  const innerRef = useRef<Handler>(null);
+  useEffect(() => {
+    if (props.focus && innerRef.current != null) {
+      innerRef.current.focus();
+    }
+  });
   const onPressDelete = (prevValue: string) => {
     if (prevValue === '') {
       props.delete();
@@ -42,11 +51,18 @@ export const Comment: React.FC<Props> = props => {
       <Textarea
         placeholder={'Edit Comment'}
         value={props.comment}
+        ref={innerRef}
         changeValue={value => props.editComment(value)}
         onPressEnter={() =>
           props.onPressEnter != null ? props.onPressEnter() : null
         }
         onPressDelete={prevValue => onPressDelete(prevValue)}
+        onPressArrowUp={() =>
+          props.onPressArrowUp != null ? props.onPressArrowUp() : null
+        }
+        onPressArrowDown={() =>
+          props.onPressArrowDown != null ? props.onPressArrowDown() : null
+        }
         customCss={css`
           margin-left: 6px;
         `}
