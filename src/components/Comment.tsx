@@ -18,12 +18,17 @@ export type Props = {
 
 export const Comment: React.FC<Props> = props => {
   const [isHover, setIsHover] = useState(false);
+  const [isHoverDelete, setIsHoverDelete] = useState(false);
+  const [beforeFocus, setBeforeFocus] = useState(false);
   const innerRef = useRef<Handler>(null);
   useEffect(() => {
-    if (props.focus && innerRef.current != null) {
-      innerRef.current.focus();
+    if (props.focus != null && props.focus !== beforeFocus) {
+      setBeforeFocus(props.focus);
+      if (props.focus && innerRef.current != null) {
+        innerRef.current.focus();
+      }
     }
-  });
+  }, [beforeFocus, props.focus]);
   const onPressDelete = (prevValue: string) => {
     if (prevValue === '') {
       props.delete();
@@ -65,6 +70,7 @@ export const Comment: React.FC<Props> = props => {
         }
         customCss={css`
           margin-left: 6px;
+          border: solid 1px ${isHoverDelete ? colors.red500 : 'rgba(0,0,0,0)'};
         `}
       />
       <AdjustHeightToTextarea
@@ -72,6 +78,8 @@ export const Comment: React.FC<Props> = props => {
           cursor: pointer;
         `}
         onClick={() => props.delete()}
+        onMouseEnter={() => setIsHoverDelete(true)}
+        onMouseLeave={() => setIsHoverDelete(false)}
       >
         <Icon
           iconname={'close'}

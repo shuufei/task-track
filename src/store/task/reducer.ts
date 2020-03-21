@@ -10,6 +10,15 @@ export const reducer = (state: State = initState, action: Actions) => {
       return produce(state, draft => {
         draft.tasks.push(generateTask());
       });
+    case 'UPDATE_TASK':
+      return produce(state, draft => {
+        const index = draft.tasks.findIndex(
+          v => v.uuid === action.payload.task.uuid
+        );
+        if (index !== -1) {
+          draft.tasks[index] = action.payload.task;
+        }
+      });
     default:
       return state;
   }
