@@ -18,10 +18,25 @@ export const TasksPage: React.FC = () => {
       `}
     >
       <h1>Task Page</h1>
-      {taskUuids.map(uuid => (
-        <TaskContainer uuid={uuid} key={uuid} />
+      {taskUuids.map((uuid, i) => (
+        <TaskContainer
+          uuid={uuid}
+          key={uuid}
+          customCss={
+            i > 0
+              ? css`
+                  margin-top: 6px;
+                `
+              : undefined
+          }
+        />
       ))}
-      <button onClick={() => dispatch(actionCreator.task.addTask())}>
+      <button
+        onClick={() => dispatch(actionCreator.task.addTask())}
+        css={css`
+          margin-top: 12px;
+        `}
+      >
         Add Task
       </button>
     </div>

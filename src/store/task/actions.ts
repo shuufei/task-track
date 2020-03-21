@@ -9,7 +9,11 @@ export interface UpdateTaskAction extends Action {
   type: 'UPDATE_TASK';
   payload: { task: Task };
 }
-export type Actions = AddTaskAction | UpdateTaskAction;
+export interface DeleteTaskAction extends Action {
+  type: 'DELETE_TASK';
+  payload: { uuid: string };
+}
+export type Actions = AddTaskAction | UpdateTaskAction | DeleteTaskAction;
 
 /** Action Creators */
 export const addTask = (): AddTaskAction => ({
@@ -21,7 +25,14 @@ export const updateTask = (
   type: 'UPDATE_TASK',
   payload
 });
+export const deleteTask = (
+  payload: DeleteTaskAction['payload']
+): DeleteTaskAction => ({
+  type: 'DELETE_TASK',
+  payload
+});
 export const actionCreator = {
   addTask,
-  updateTask
+  updateTask,
+  deleteTask
 };

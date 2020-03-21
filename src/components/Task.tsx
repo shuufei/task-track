@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 /** @jsx jsx */
-import { jsx, css } from '@emotion/core';
+import { jsx, css, SerializedStyles } from '@emotion/core';
 
 import { colors } from 'styles/color';
 import { shadow } from 'styles/shadow';
@@ -26,6 +26,7 @@ export type Props = {
   editTitle: (title: string) => void;
   editComments: (comments: string[]) => void;
   done: (isDone: boolean) => void;
+  customCss?: SerializedStyles;
 };
 
 export const Task: React.FC<Props> = props => {
@@ -69,6 +70,7 @@ export const Task: React.FC<Props> = props => {
         border: solid 1px
           ${props.isPlaying ? colors.primary500 : 'rgba(0,0,0,0)'};
         ${shadow}
+        ${props.customCss}
       `}
     >
       <div
@@ -80,7 +82,7 @@ export const Task: React.FC<Props> = props => {
         <AdjustHeightToTextarea>
           <Menu
             addComment={() => addComment(props.comments.length)}
-            delete={() => {}}
+            delete={() => props.delete()}
           />
         </AdjustHeightToTextarea>
         <AdjustHeightToTextarea>

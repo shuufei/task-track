@@ -4,9 +4,11 @@ import { useSelector, useDispatch } from 'react-redux';
 import { Task } from 'components/Task';
 import { RootState, actionCreator } from 'store';
 import { Task as TaskType } from 'model/task';
+import { SerializedStyles } from '@emotion/core';
 
 export type Props = {
   uuid: string;
+  customCss?: SerializedStyles;
 };
 
 export const TaskContainer: React.FC<Props> = props => {
@@ -67,6 +69,9 @@ export const TaskContainer: React.FC<Props> = props => {
       comments
     });
   };
+  const deleteTask = () => {
+    dispatch(actionCreator.task.deleteTask({ uuid: props.uuid }));
+  };
   useEffect(() => {
     // TODO: isPlaying === true の時だけintervalをset
     const interval = setInterval(() => {
@@ -99,7 +104,8 @@ export const TaskContainer: React.FC<Props> = props => {
       editTitle={value => updateTitle(value)}
       addComment={() => {}}
       editComments={comments => updateComments(comments)}
-      delete={() => {}}
+      delete={() => deleteTask()}
+      customCss={props.customCss}
     />
   );
 };

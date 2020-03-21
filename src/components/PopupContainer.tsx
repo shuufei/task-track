@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 /** @jsx jsx */
 import { jsx, css, keyframes } from '@emotion/core';
 
@@ -37,6 +37,12 @@ export const PopupContainer: React.FC<Props> = props => {
     setIsShown(true);
     document.addEventListener('click', documentClickHandler);
   };
+  useEffect(() => {
+    return () => {
+      // TODO: click handlerを削除しないといけないはず?
+      // removeDocumentClickHandler();
+    };
+  }, []);
   return (
     <div
       css={css`
@@ -58,6 +64,7 @@ export const PopupContainer: React.FC<Props> = props => {
           visibility: ${isShown ? 'visible' : 'hidden'};
           animation: ${isShown == null ? '' : isShown ? fadeIn : fadeOut} 0.2s
             ease-out forwards;
+          z-index: 2;
         `}
       >
         {props.popup}
