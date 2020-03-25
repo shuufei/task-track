@@ -78,7 +78,7 @@ export const TimeControlPanel: React.FC<Props> = props => {
         </button>
         <button
           css={css`
-            margin-top: 5px;
+            margin-top: 4px;
             ${buttonStyle};
           `}
           onClick={() => add(60 * 30)}
@@ -87,7 +87,7 @@ export const TimeControlPanel: React.FC<Props> = props => {
         </button>
         <button
           css={css`
-            margin-top: 5px;
+            margin-top: 4px;
             ${buttonStyle};
           `}
           onClick={() => add(60 * 60)}

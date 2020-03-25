@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 /** @jsx jsx */
 import { jsx, css, keyframes } from '@emotion/core';
 
@@ -12,23 +12,29 @@ export type Props = {
 };
 
 export const PopupContainer: React.FC<Props> = props => {
+  // TODO: こんなにuseCallback使って書かないといけないもんなのか調べる
+
   const [isShown, setIsShown] = useState<boolean | null>(null);
   const popupRef = useRef<HTMLDivElement>(null);
-  const documentClickHandler = (event: MouseEvent) => {
-    if (props.keep && popupRef.current?.contains(event.target as Node)) {
-      return;
-    }
-    hide();
-  };
 
-  const hide = () => {
+  let documentClickHandler: (
+    event: MouseEvent
+  ) => void = useCallback((_: MouseEvent) => {}, []);
+
+  const hide = useCallback(() => {
     setIsShown(false);
-    removeDocumentClickHandler();
-  };
-
-  const removeDocumentClickHandler = () => {
     document.removeEventListener('click', documentClickHandler);
-  };
+  }, [documentClickHandler]);
+
+  documentClickHandler = useCallback(
+    (event: MouseEvent) => {
+      if (props.keep && popupRef.current?.contains(event.target as Node)) {
+        return;
+      }
+      hide();
+    },
+    [hide, props.keep]
+  );
 
   const handleToggleButtonClick = () => {
     if (isShown) {
@@ -39,10 +45,9 @@ export const PopupContainer: React.FC<Props> = props => {
   };
   useEffect(() => {
     return () => {
-      // TODO: click handlerを削除しないといけないはず?
-      // removeDocumentClickHandler();
+      document.removeEventListener('click', documentClickHandler);
     };
-  }, []);
+  }, [documentClickHandler]);
   return (
     <div
       css={css`
