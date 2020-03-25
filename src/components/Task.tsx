@@ -149,13 +149,13 @@ export const Task: React.FC<Props> = props => {
           />
           <div
             css={css`
-              padding: 8px 8px 4px 24px;
+              padding: 6px 8px 0 24px;
             `}
           >
             {props.comments.map((comment, i) => (
               <div
                 css={css`
-                  margin-top: ${i !== 0 ? '4px' : 0};
+                  margin-top: ${i !== 0 ? '2px' : 0};
                 `}
                 key={i}
               >

@@ -4,7 +4,10 @@ import { jsx, css } from '@emotion/core';
 
 import { Icon } from './Icon';
 import { colors } from 'styles/color';
+import * as typography from 'styles/typography';
 import { Textarea, AdjustHeightToTextarea, Handler } from './Textarea';
+
+const COMMENT_TEXTAREA_HEIGHT = '24px';
 
 export type Props = {
   comment: string;
@@ -43,11 +46,15 @@ export const Comment: React.FC<Props> = props => {
       onMouseEnter={() => setIsHover(true)}
       onMouseLeave={() => setIsHover(false)}
     >
-      <AdjustHeightToTextarea>
+      <AdjustHeightToTextarea
+        css={css`
+          height: ${COMMENT_TEXTAREA_HEIGHT};
+        `}
+      >
         <span
           css={css`
-            width: 5px;
-            height: 5px;
+            width: 4px;
+            height: 4px;
             background-color: ${colors.black400};
             border-radius: 50%;
           `}
@@ -69,13 +76,15 @@ export const Comment: React.FC<Props> = props => {
           props.onPressArrowDown != null ? props.onPressArrowDown() : null
         }
         customCss={css`
-          margin-left: 6px;
+          margin-left: 4px;
           border: solid 1px ${isHoverDelete ? colors.red500 : 'rgba(0,0,0,0)'};
+          ${typography.caption};
         `}
       />
       <AdjustHeightToTextarea
         css={css`
           cursor: pointer;
+          height: ${COMMENT_TEXTAREA_HEIGHT};
         `}
         onClick={() => props.delete()}
         onMouseEnter={() => setIsHoverDelete(true)}
@@ -85,6 +94,7 @@ export const Comment: React.FC<Props> = props => {
           iconname={'close'}
           customCss={css`
             margin-left: 12px;
+            box-sizing: border-box;
             visibility: ${isHover ? 'visible' : 'hidden'};
           `}
         />

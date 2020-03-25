@@ -40,7 +40,7 @@ const buttonStyle = css`
   border: none;
   background-color: ${colors.white};
   padding: 6px 8px;
-  width: 96px;
+  width: 104px;
   border-radius: 2px;
   cursor: pointer;
   ${typography.caption};

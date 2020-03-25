@@ -11,7 +11,7 @@ const weight = {
 };
 const size = {
   m: '14px',
-  s: '11px',
+  s: '12px',
   ss: '9px'
 };
 
