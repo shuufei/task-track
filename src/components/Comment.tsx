@@ -5,7 +5,8 @@ import { jsx, css } from '@emotion/core';
 import { Icon } from './Icon';
 import { colors } from 'styles/color';
 import * as typography from 'styles/typography';
-import { Textarea, AdjustHeightToTextarea, Handler } from './Textarea';
+import { AdjustHeightToTextarea, Handler } from './Textarea';
+import { CommentTextarea } from './CommentTextarea';
 
 const COMMENT_TEXTAREA_HEIGHT = '24px';
 
@@ -13,9 +14,9 @@ export type Props = {
   comment: string;
   editComment: (comment: string) => void;
   delete: () => void;
-  onPressEnter?: () => void;
-  onPressArrowUp?: () => void;
-  onPressArrowDown?: () => void;
+  generateNextComment: () => void;
+  toPrevComment: () => void;
+  toNextComment: () => void;
   focus?: boolean;
 };
 
@@ -32,15 +33,6 @@ export const Comment: React.FC<Props> = props => {
       }
     }
   }, [beforeFocus, props.focus]);
-  const onPressDelete = (
-    event: React.KeyboardEvent<HTMLTextAreaElement>,
-    prevValue: string
-  ) => {
-    if (prevValue === '') {
-      event.preventDefault();
-      props.delete();
-    }
-  };
   return (
     <div
       css={css`
@@ -64,21 +56,14 @@ export const Comment: React.FC<Props> = props => {
           `}
         ></span>
       </AdjustHeightToTextarea>
-      <Textarea
-        placeholder={'Edit Comment'}
-        value={props.comment}
+      <CommentTextarea
         ref={innerRef}
-        changeValue={value => props.editComment(value)}
-        onPressEnter={() =>
-          props.onPressEnter != null ? props.onPressEnter() : null
-        }
-        onPressDelete={(event, prevValue) => onPressDelete(event, prevValue)}
-        onPressArrowUp={() =>
-          props.onPressArrowUp != null ? props.onPressArrowUp() : null
-        }
-        onPressArrowDown={() =>
-          props.onPressArrowDown != null ? props.onPressArrowDown() : null
-        }
+        comment={props.comment}
+        editComment={value => props.editComment(value)}
+        generateNextComment={() => props.generateNextComment()}
+        deleteComment={() => props.delete()}
+        toPrevComment={() => props.toPrevComment()}
+        toNextComment={() => props.toNextComment()}
         customCss={css`
           margin-left: 4px;
           border: solid 1px ${isHoverDelete ? colors.red500 : 'rgba(0,0,0,0)'};

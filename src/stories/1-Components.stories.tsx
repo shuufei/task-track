@@ -178,6 +178,9 @@ export const _Comment = () => {
         comment={comment}
         editComment={v => setComment(v)}
         delete={() => action('comment delete')}
+        generateNextComment={() => {}}
+        toPrevComment={() => {}}
+        toNextComment={() => {}}
       />
     </ComponentWrap>
   );

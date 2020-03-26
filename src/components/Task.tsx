@@ -163,9 +163,9 @@ export const Task: React.FC<Props> = props => {
                   comment={comment}
                   editComment={comment => editComment(comment, i)}
                   delete={() => deleteComment(i)}
-                  onPressEnter={() => addComment(i + 1)}
-                  onPressArrowUp={() => focusPrevComment(i)}
-                  onPressArrowDown={() => focusNextComment(i)}
+                  generateNextComment={() => addComment(i + 1)}
+                  toPrevComment={() => focusPrevComment(i)}
+                  toNextComment={() => focusNextComment(i)}
                   focus={i === focusCommentIndex}
                 />
               </div>

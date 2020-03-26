@@ -6,7 +6,7 @@ import { colors } from 'styles/color';
 import * as typography from 'styles/typography';
 
 export const INITIAL_HEIGHT = '27px';
-const IME_ENTER_KEY_CODE = 229;
+export const IME_ENTER_KEY_CODE = 229;
 
 export type Key = 'Enter' | 'Tab' | 'Backspace' | 'ArrowUp' | 'ArrowDown';
 
@@ -15,14 +15,17 @@ export type Props = {
   placeholder?: string;
   value?: string;
   changeValue?: (value: string) => void;
-  onPressEnter?: () => void;
+  onPressEnter?: (event: React.KeyboardEvent<HTMLTextAreaElement>) => void;
   onPressTab?: () => void;
-  onPressDelete?: (
+  onPressDelete?: (event: React.KeyboardEvent<HTMLTextAreaElement>) => void;
+  onPressArrowUp?: (
     event: React.KeyboardEvent<HTMLTextAreaElement>,
-    prevValue: string
+    ref: HTMLTextAreaElement
   ) => void;
-  onPressArrowUp?: () => void;
-  onPressArrowDown?: () => void;
+  onPressArrowDown?: (
+    event: React.KeyboardEvent<HTMLTextAreaElement>,
+    ref: HTMLTextAreaElement
+  ) => void;
 };
 
 export type Handler = {
@@ -56,19 +59,12 @@ export const Textarea = React.forwardRef<Handler, Props>((props, ref) => {
   });
 
   const onKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    const isSelecting =
-      innerRef.current?.selectionStart !== innerRef.current?.selectionEnd;
     switch (event.key as Key) {
       case 'Enter':
-        if (
-          event.shiftKey ||
-          event.keyCode === IME_ENTER_KEY_CODE ||
-          props.onPressEnter == null
-        ) {
+        if (props.onPressEnter == null) {
           return;
         }
-        event.preventDefault();
-        props.onPressEnter();
+        props.onPressEnter(event);
         break;
       case 'Tab':
         if (props.onPressTab == null) {
@@ -78,40 +74,22 @@ export const Textarea = React.forwardRef<Handler, Props>((props, ref) => {
         props.onPressTab();
         break;
       case 'Backspace':
-        const prevValue = (event.target as any).value;
         if (props.onPressDelete == null) {
           return;
         }
-        props.onPressDelete(event, prevValue);
+        props.onPressDelete(event);
         break;
       case 'ArrowUp':
-        if (event.shiftKey || props.onPressArrowUp == null) {
+        if (props.onPressArrowUp == null || innerRef.current == null) {
           return;
         }
-        // TODO: 実装を使う側にうつす
-        if (innerRef.current != null && !isSelecting) {
-          const currentLine = innerRef.current.value
-            .substr(0, innerRef.current.selectionStart)
-            .split('\n').length;
-          if (currentLine <= 1) {
-            props.onPressArrowUp();
-          }
-        }
+        props.onPressArrowUp(event, innerRef.current);
         break;
       case 'ArrowDown':
-        if (event.shiftKey || props.onPressArrowDown == null) {
+        if (props.onPressArrowDown == null || innerRef.current == null) {
           return;
         }
-        // TODO: 実装を使う側にうつす
-        if (innerRef.current != null && !isSelecting) {
-          const totalLine = innerRef.current.value.split('\n').length;
-          const currentLine = innerRef.current.value
-            .substr(0, innerRef.current.selectionStart)
-            .split('\n').length;
-          if (totalLine === currentLine) {
-            props.onPressArrowDown();
-          }
-        }
+        props.onPressArrowDown(event, innerRef.current);
         break;
       default:
         break;
