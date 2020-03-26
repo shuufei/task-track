@@ -17,7 +17,10 @@ export type Props = {
   changeValue?: (value: string) => void;
   onPressEnter?: () => void;
   onPressTab?: () => void;
-  onPressDelete?: (prevValue: string) => void;
+  onPressDelete?: (
+    event: React.KeyboardEvent<HTMLTextAreaElement>,
+    prevValue: string
+  ) => void;
   onPressArrowUp?: () => void;
   onPressArrowDown?: () => void;
 };
@@ -79,7 +82,7 @@ export const Textarea = React.forwardRef<Handler, Props>((props, ref) => {
         if (props.onPressDelete == null) {
           return;
         }
-        props.onPressDelete(prevValue);
+        props.onPressDelete(event, prevValue);
         break;
       case 'ArrowUp':
         if (event.shiftKey || props.onPressArrowUp == null) {

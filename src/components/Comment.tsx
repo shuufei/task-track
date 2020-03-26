@@ -32,8 +32,12 @@ export const Comment: React.FC<Props> = props => {
       }
     }
   }, [beforeFocus, props.focus]);
-  const onPressDelete = (prevValue: string) => {
+  const onPressDelete = (
+    event: React.KeyboardEvent<HTMLTextAreaElement>,
+    prevValue: string
+  ) => {
     if (prevValue === '') {
+      event.preventDefault();
       props.delete();
     }
   };
@@ -68,7 +72,7 @@ export const Comment: React.FC<Props> = props => {
         onPressEnter={() =>
           props.onPressEnter != null ? props.onPressEnter() : null
         }
-        onPressDelete={prevValue => onPressDelete(prevValue)}
+        onPressDelete={(event, prevValue) => onPressDelete(event, prevValue)}
         onPressArrowUp={() =>
           props.onPressArrowUp != null ? props.onPressArrowUp() : null
         }
