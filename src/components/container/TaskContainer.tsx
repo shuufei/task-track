@@ -1,7 +1,7 @@
 import React, { useEffect, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 
-import { Task } from 'components/Task';
+import { Task } from 'components/presentation/Task';
 import { RootState, actionCreator } from 'store';
 import { Task as TaskType } from 'model/task';
 import { SerializedStyles } from '@emotion/core';

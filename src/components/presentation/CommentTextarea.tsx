@@ -1,6 +1,7 @@
 import React from 'react';
 /** @jsx jsx */
 import { jsx, SerializedStyles } from '@emotion/core';
+
 import { Handler, Textarea, IME_ENTER_KEY_CODE } from './Textarea';
 
 export type Props = {

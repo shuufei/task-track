@@ -3,16 +3,16 @@ import React, { useState, useEffect } from 'react';
 import { jsx, css } from '@emotion/core';
 import { action } from '@storybook/addon-actions';
 
-import { TextField } from 'components/TextField';
-import { Checkbox } from 'components/Checkbox';
-import { Icon } from 'components/Icon';
-import { TimeField } from 'components/TimeField';
-import { TimeControl } from 'components/TimeControl';
-import { TimeControlPanel } from 'components/TimeControlPanel';
-import { Menu } from 'components/Menu';
-import { Comment } from 'components/Comment';
-import { Textarea } from 'components/Textarea';
-import { Task as TaskComponent } from 'components/Task';
+import { TextField } from 'components/presentation/TextField';
+import { Checkbox } from 'components/presentation/Checkbox';
+import { Icon } from 'components/presentation/Icon';
+import { TimeField } from 'components/presentation/TimeField';
+import { TimeControl } from 'components/presentation/TimeControl';
+import { TimeControlPanel } from 'components/presentation/TimeControlPanel';
+import { Menu } from 'components/presentation/Menu';
+import { Comment } from 'components/presentation/Comment';
+import { Textarea } from 'components/presentation/Textarea';
+import { Task as TaskComponent } from 'components/presentation/Task';
 import { Task } from 'model/task';
 
 export default {
