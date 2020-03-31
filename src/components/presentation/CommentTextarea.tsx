@@ -66,9 +66,9 @@ export const CommentTextarea = React.forwardRef<Handler, Props>(
         placeholder={'Edit Comment'}
         value={props.comment}
         ref={ref}
-        changeValue={value => props.editComment(value)}
-        onPressEnter={event => onPressEnter(event)}
-        onPressDelete={event => onPressDelete(event)}
+        changeValue={props.editComment}
+        onPressEnter={onPressEnter}
+        onPressDelete={onPressDelete}
         onPressArrowUp={(event, textarea) => onPressArrowUp(event, textarea)}
         onPressArrowDown={(event, textarea) =>
           onPressArrowDown(event, textarea)

@@ -8,6 +8,8 @@ export type Task = {
   isPlaying: boolean;
   startUnixtime: number;
   comments: string[];
+  startedAt?: Date;
+  updatedAt: Date;
 };
 
 export const generateTask = () => ({
@@ -17,5 +19,6 @@ export const generateTask = () => ({
   timesec: 0,
   isPlaying: false,
   startUnixtime: 0,
-  comments: []
+  comments: [],
+  updatedAt: new Date()
 });

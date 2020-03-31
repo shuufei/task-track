@@ -15,6 +15,7 @@ export const TaskContainer: React.FC<Props> = props => {
   const task = useSelector((state: RootState) =>
     state.task.tasks.find(v => v.uuid === props.uuid)
   );
+  const focusUuid = useSelector((state: RootState) => state.task.focusUuid);
   const dispatch = useDispatch();
 
   const updateTask = useCallback(
@@ -48,7 +49,8 @@ export const TaskContainer: React.FC<Props> = props => {
     }
     updateTask({
       ...task,
-      isPlaying: isPlaying
+      isPlaying: isPlaying,
+      startedAt: isPlaying ? new Date() : undefined
     });
   };
   const updateTitle = (title: string) => {
@@ -71,6 +73,9 @@ export const TaskContainer: React.FC<Props> = props => {
   };
   const deleteTask = () => {
     dispatch(actionCreator.task.deleteTask({ uuid: props.uuid }));
+  };
+  const addTask = () => {
+    dispatch(actionCreator.task.addTaskByUuid({ uuid: props.uuid }));
   };
   useEffect(() => {
     // TODO: isPlaying === true の時だけintervalをset
@@ -105,7 +110,9 @@ export const TaskContainer: React.FC<Props> = props => {
       addComment={() => {}}
       editComments={comments => updateComments(comments)}
       delete={() => deleteTask()}
+      addTask={addTask}
       customCss={props.customCss}
+      focus={focusUuid === props.uuid}
     />
   );
 };

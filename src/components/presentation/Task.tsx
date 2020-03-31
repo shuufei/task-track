@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 /** @jsx jsx */
 import { jsx, css, SerializedStyles } from '@emotion/core';
 
@@ -8,8 +8,9 @@ import { Checkbox } from './Checkbox';
 import { TimeControl } from './TimeControl';
 import { Menu } from './Menu';
 import { Icon } from './Icon';
-import { Textarea, AdjustHeightToTextarea } from './Textarea';
+import { AdjustHeightToTextarea, Handler } from './Textarea';
 import { Comment } from './Comment';
+import { TaskTextarea } from './TaskTextare';
 
 export type Props = {
   title: string;
@@ -26,13 +27,25 @@ export type Props = {
   editTitle: (title: string) => void;
   editComments: (comments: string[]) => void;
   done: (isDone: boolean) => void;
+  addTask: () => void;
   customCss?: SerializedStyles;
+  focus?: boolean;
 };
 
 export const Task: React.FC<Props> = props => {
   const [focusCommentIndex, setFocusCommentIndex] = useState<number | null>(
     null
   );
+  const [beforeFocus, setBeforeFocus] = useState(false);
+  const innerRef = useRef<Handler>(null);
+  useEffect(() => {
+    if (props.focus != null && props.focus !== beforeFocus) {
+      setBeforeFocus(props.focus);
+      if (props.focus && innerRef.current != null) {
+        innerRef.current.focus();
+      }
+    }
+  }, [beforeFocus, props.focus]);
   const deleteComment = (index: number) => {
     const comments = [...props.comments];
     comments.splice(index, 1);
@@ -96,10 +109,13 @@ export const Task: React.FC<Props> = props => {
             `}
           />
         </AdjustHeightToTextarea>
-        <Textarea
-          placeholder={'Input Task'}
-          value={props.title}
-          changeValue={value => props.editTitle(value)}
+        <TaskTextarea
+          title={props.title}
+          ref={innerRef}
+          editTitle={props.editTitle}
+          onPressEnter={props.addTask}
+          onPressTab={() => {}}
+          onPressDelete={props.delete}
           customCss={css`
             margin-left: 6px;
             text-decoration: ${props.isDone ? 'line-through' : 'unset'};

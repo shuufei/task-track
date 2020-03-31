@@ -8,7 +8,22 @@ export const reducer = (state: State = initState, action: Actions) => {
   switch (action.type) {
     case 'ADD_TASK':
       return produce(state, draft => {
-        draft.tasks.push(generateTask());
+        const task = generateTask();
+        draft.tasks.push(task);
+        draft.focusUuid = task.uuid;
+      });
+    case 'ADD_TASK_BY_UUID':
+      return produce(state, draft => {
+        const task = generateTask();
+        const index = draft.tasks.findIndex(
+          v => v.uuid === action.payload.uuid
+        );
+        if (index === -1) {
+          draft.tasks.push(task);
+        } else {
+          draft.tasks.splice(index + 1, 0, task);
+        }
+        draft.focusUuid = task.uuid;
       });
     case 'UPDATE_TASK':
       return produce(state, draft => {

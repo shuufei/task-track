@@ -16,7 +16,7 @@ export type Props = {
   value?: string;
   changeValue?: (value: string) => void;
   onPressEnter?: (event: React.KeyboardEvent<HTMLTextAreaElement>) => void;
-  onPressTab?: () => void;
+  onPressTab?: (event: React.KeyboardEvent<HTMLTextAreaElement>) => void;
   onPressDelete?: (event: React.KeyboardEvent<HTMLTextAreaElement>) => void;
   onPressArrowUp?: (
     event: React.KeyboardEvent<HTMLTextAreaElement>,
@@ -71,7 +71,7 @@ export const Textarea = React.forwardRef<Handler, Props>((props, ref) => {
           return;
         }
         event.preventDefault();
-        props.onPressTab();
+        props.onPressTab(event);
         break;
       case 'Backspace':
         if (props.onPressDelete == null) {

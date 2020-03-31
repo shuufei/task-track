@@ -198,7 +198,8 @@ export const _Task = () => {
     timesec: 0,
     isPlaying: false,
     startUnixtime: 0,
-    comments: []
+    comments: [],
+    updatedAt: new Date()
   };
   const [task, setTask] = useState(initialTask);
   const setTimesec = (sec: number) => {
@@ -261,6 +262,7 @@ export const _Task = () => {
       addComment={() => {}}
       editComments={comments => setComments(comments)}
       delete={() => {}}
+      addTask={() => {}}
     />
   );
 };
