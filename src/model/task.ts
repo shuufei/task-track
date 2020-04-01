@@ -6,9 +6,8 @@ export type Task = {
   isDone: boolean;
   timesec: number;
   isPlaying: boolean;
-  startUnixtime: number;
   comments: string[];
-  startedAt?: Date;
+  timesecUpdatedTimestamp?: number;
   updatedAt: Date;
 };
 
@@ -18,7 +17,6 @@ export const generateTask = () => ({
   isDone: false,
   timesec: 0,
   isPlaying: false,
-  startUnixtime: 0,
   comments: [],
   updatedAt: new Date()
 });

@@ -19,7 +19,7 @@ export const convertToTimeFormatFromSec = (timeSec: number) => {
   }
   const hours = Math.floor(timeSec / (60 * 60));
   const minutes = Math.floor((timeSec - hours * 60 * 60) / 60);
-  const seconds = timeSec - hours * 60 * 60 - minutes * 60;
+  const seconds = Math.floor(timeSec) - hours * 60 * 60 - minutes * 60;
   const zeroPadding = (n: number) => {
     return String(n).padStart(2, '0');
   };

@@ -197,7 +197,6 @@ export const _Task = () => {
     isDone: false,
     timesec: 0,
     isPlaying: false,
-    startUnixtime: 0,
     comments: [],
     updatedAt: new Date()
   };

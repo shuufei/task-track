@@ -20,6 +20,7 @@ export const TaskContainer: React.FC<Props> = props => {
 
   const updateTask = useCallback(
     (task: TaskType) => {
+      task.updatedAt = new Date();
       dispatch(actionCreator.task.updateTask({ task }));
     },
     [dispatch]
@@ -30,7 +31,8 @@ export const TaskContainer: React.FC<Props> = props => {
     }
     updateTask({
       ...task,
-      timesec: sec
+      timesec: sec,
+      timesecUpdatedTimestamp: new Date().valueOf()
     });
   };
   const updateIsDone = (isDone: boolean) => {
@@ -50,7 +52,7 @@ export const TaskContainer: React.FC<Props> = props => {
     updateTask({
       ...task,
       isPlaying: isPlaying,
-      startedAt: isPlaying ? new Date() : undefined
+      timesecUpdatedTimestamp: isPlaying ? new Date().valueOf() : undefined
     });
   };
   const updateTitle = (title: string) => {
@@ -78,17 +80,21 @@ export const TaskContainer: React.FC<Props> = props => {
     dispatch(actionCreator.task.addTaskByUuid({ uuid: props.uuid }));
   };
   useEffect(() => {
-    // TODO: isPlaying === true の時だけintervalをset
     const interval = setInterval(() => {
       if (task == null) {
         return;
       }
-      if (task.isPlaying) {
-        updateTask({
-          ...task,
-          timesec: task.timesec + 1
-        });
+      if (!task.isPlaying || task.timesecUpdatedTimestamp == null) {
+        return;
       }
+      const diffSec =
+        (new Date().valueOf() - task.timesecUpdatedTimestamp) / 1000;
+      const timesec = task.timesec + diffSec;
+      updateTask({
+        ...task,
+        timesec,
+        timesecUpdatedTimestamp: new Date().valueOf()
+      });
     }, 1000);
     return () => {
       clearInterval(interval);
