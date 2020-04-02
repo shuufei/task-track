@@ -5,6 +5,7 @@ import { jsx, css } from '@emotion/core';
 
 import { RootState, actionCreator } from 'store';
 import { TaskContainer } from 'components/container/TaskContainer';
+import { Icon } from 'components/presentation/Icon';
 
 export const TasksPage: React.FC = () => {
   const taskUuids = useSelector((state: RootState) =>
@@ -17,7 +18,6 @@ export const TasksPage: React.FC = () => {
         padding: 12px 24px;
       `}
     >
-      <h1>Task Page</h1>
       {taskUuids.map((uuid, i) => (
         <TaskContainer
           uuid={uuid}
@@ -31,14 +31,17 @@ export const TasksPage: React.FC = () => {
           }
         />
       ))}
-      <button
+      <div
         onClick={() => dispatch(actionCreator.task.addTask())}
         css={css`
           margin-top: 12px;
+          padding: 4px;
+          display: inline-block;
+          cursor: pointer;
         `}
       >
-        Add Task
-      </button>
+        <Icon iconname={'plus'} />
+      </div>
     </div>
   );
 };
