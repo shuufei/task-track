@@ -1,8 +1,9 @@
 import React, { useRef, useState } from 'react';
 /** @jsx jsx */
 import { jsx, css } from '@emotion/core';
+import { useDrag, useDrop, DndProvider } from 'react-dnd';
+import Backend from 'react-dnd-html5-backend';
 
-import logo from './logo.svg';
 import './App.css';
 
 const App: React.FC = () => {
@@ -18,6 +19,13 @@ const App: React.FC = () => {
       (e.target as any).style.background = 'red';
     }
   });
+  const [list, setList] = useState([
+    { id: 1 },
+    { id: 2 },
+    { id: 3 },
+    { id: 4 },
+    { id: 5 }
+  ]);
   return (
     <div className="App">
       <TextInputWithFocusButton />
@@ -26,6 +34,30 @@ const App: React.FC = () => {
       <DraggableContent uuid={'1'} />
       <DropZone />
       <DraggableContent uuid={'2'} />
+      <div
+        css={css`
+          margin-top: 32px;
+        `}
+      >
+        <DndProvider backend={Backend}>
+          {list.map(v => {
+            return (
+              <SimpleDragAndDropComponent
+                itemId={v.id}
+                sort={(src, dist) => {
+                  console.log('--- sort: ', src, dist);
+                  const l = [...list];
+                  const srcIndex = l.findIndex(v => v.id === src);
+                  const distIndex = l.findIndex(v => v.id === dist);
+                  l.splice(srcIndex, 1);
+                  l.splice(distIndex, 0, { id: src });
+                  setList(l);
+                }}
+              />
+            );
+          })}
+        </DndProvider>
+      </div>
     </div>
   );
 };
@@ -114,3 +146,86 @@ export const DropZone: React.FC = () => (
     className="dropzone"
   ></div>
 );
+
+export const SimpleDragAndDropComponent: React.FC<{
+  itemId: number;
+  sort: (src: number, dist: number) => void;
+}> = props => {
+  const [isDragging, setIsDragging] = useState(false);
+  const dragref = useRef(null);
+  const dropref = useRef(null);
+  const dropref2 = useRef(null);
+  const [o, connectDrag, preview] = useDrag({
+    item: { id: props.itemId, type: 'SIMPLE_COMPONENT', created: '10:06' },
+    collect: monitor => ({
+      isDragging: !!monitor.isDragging()
+    })
+  });
+  const [{ isOver }, connectDrop] = useDrop({
+    accept: 'SIMPLE_COMPONENT',
+    hover(item) {
+      // console.log('Hovering item.id: ', item);
+    },
+    drop: v => {
+      // console.log('--- dopr: ', props.itemId);
+      props.sort((v as any).id, props.itemId);
+    },
+    collect: monitor => ({
+      isOver: !!monitor.isOver()
+    })
+  });
+  const [o2, connectDrop2] = useDrop({
+    accept: 'SIMPLE_COMPONENT',
+    hover(item) {
+      // console.log('Hovering item.id: ', item);
+    },
+    drop: v => {
+      // console.log('--- dopr: ', props.itemId);
+      props.sort((v as any).id, props.itemId);
+    },
+    collect: monitor => ({
+      isOver: !!monitor.isOver()
+    })
+  });
+
+  connectDrag(dragref);
+  connectDrop(dropref);
+  connectDrop2(dropref2);
+
+  return (
+    <div
+      ref={isDragging ? preview : dropref}
+      css={css`
+        /* background-color: ${isOver ? 'blue' : '#333'}; */
+        background-color: #333;
+        position: relative;
+        display: flex;
+      `}
+    >
+      <span
+        ref={dragref}
+        css={css`
+          width: 20px;
+          height: 20px;
+          background: red;
+          display: inline-block;
+          cursor: pointer;
+        `}
+        onMouseDown={() => setIsDragging(true)}
+        onMouseUp={() => setIsDragging(false)}
+        onDragEnd={() => setIsDragging(false)}
+      ></span>
+      Item: {props.itemId}, {isDragging ? 'dragging' : 'none'}
+      <div
+        ref={dropref2}
+        css={css`
+          position: absolute;
+          bottom: 0;
+          height: 5px;
+          width: 100%;
+          background-color: ${(isOver && o2.isOver) || isOver ? 'red' : '#333'};
+        `}
+      ></div>
+    </div>
+  );
+};
