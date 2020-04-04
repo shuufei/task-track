@@ -1,5 +1,6 @@
 export const colors = {
   primary500: '#2F80ED',
+  primary400: '#5999E3',
   red500: '#EB5757',
   green500: '#27AE60',
   black500: '#202020',
@@ -10,5 +11,6 @@ export const colors = {
   black100: '#E0E0E0',
   black80: '#F0F0F0',
   black50: '#FAFAFA',
-  white: '#ffffff'
+  white: '#ffffff',
+  transparent: 'rgba(0,0,0,0)'
 };

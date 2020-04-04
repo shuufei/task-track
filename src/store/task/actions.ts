@@ -17,11 +17,21 @@ export interface DeleteTaskAction extends Action {
   type: 'DELETE_TASK';
   payload: { uuid: string };
 }
+export interface SetHoverTaskUuidAction extends Action {
+  type: 'SET_HOVER_TASK_UUID';
+  payload: { uuid: string | undefined };
+}
+export interface MoveDragTaskAction extends Action {
+  type: 'MOVE_TASK';
+  payload: { draggedTaskUuid: string; droppedTaskUuid: string };
+}
 export type Actions =
   | AddTaskAction
   | AddTaskByUuidAction
   | UpdateTaskAction
-  | DeleteTaskAction;
+  | DeleteTaskAction
+  | SetHoverTaskUuidAction
+  | MoveDragTaskAction;
 
 /** Action Creators */
 export const addTask = (): AddTaskAction => ({
@@ -45,9 +55,23 @@ export const deleteTask = (
   type: 'DELETE_TASK',
   payload
 });
+export const setHoverTaskUuid = (
+  payload: SetHoverTaskUuidAction['payload']
+): SetHoverTaskUuidAction => ({
+  type: 'SET_HOVER_TASK_UUID',
+  payload
+});
+export const moveDragTask = (
+  payload: MoveDragTaskAction['payload']
+): MoveDragTaskAction => ({
+  type: 'MOVE_TASK',
+  payload
+});
 export const actionCreator = {
   addTask,
   addTaskByUuid,
   updateTask,
-  deleteTask
+  deleteTask,
+  setHoverTaskUuid,
+  moveDragTask
 };

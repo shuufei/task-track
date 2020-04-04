@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 /** @jsx jsx */
 import { jsx, css, SerializedStyles } from '@emotion/core';
+import { useDrag, useDrop, DragObjectWithType } from 'react-dnd';
 
 import { colors } from 'styles/color';
 import { shadow } from 'styles/shadow';
@@ -12,7 +13,12 @@ import { AdjustHeightToTextarea, Handler } from './Textarea';
 import { Comment } from './Comment';
 import { TaskTextarea } from './TaskTextare';
 
+export const DRAG_TYPE_TASK = 'TASK';
+
+type DragObjectType = DragObjectWithType & { uuid: string };
+
 export type Props = {
+  uuid: string;
   title: string;
   timesec: number;
   isDone: boolean;
@@ -28,6 +34,8 @@ export type Props = {
   editComments: (comments: string[]) => void;
   done: (isDone: boolean) => void;
   addTask: () => void;
+  onHover: (draggedTaskUuid: string) => void;
+  onDragEnd: () => void;
   customCss?: SerializedStyles;
   focus?: boolean;
 };
@@ -74,8 +82,35 @@ export const Task: React.FC<Props> = props => {
         : currentIndex + 1
     );
   };
+
+  const [isDragging, setIsDragging] = useState(false);
+  const handleRef = useRef(null);
+  const dropRef = useRef(null);
+  const [, connectDrag, previewRef] = useDrag({
+    item: { uuid: props.uuid, type: DRAG_TYPE_TASK },
+    begin: () => {
+      setIsDragging(true);
+    },
+    end: () => {
+      setIsDragging(false);
+      props.onDragEnd();
+    }
+  });
+  const [, connectDrop] = useDrop({
+    accept: DRAG_TYPE_TASK,
+    hover: (v: DragObjectType) => {
+      props.onHover(v.uuid);
+    },
+    collect: monitor => ({
+      isOver: !!monitor.isOver()
+    })
+  });
+  connectDrag(handleRef);
+  connectDrop(dropRef);
+
   return (
     <div
+      ref={previewRef}
       css={css`
         background-color: ${colors.white};
         padding: 6px 16px 6px 10px;
@@ -84,113 +119,130 @@ export const Task: React.FC<Props> = props => {
           ${props.isPlaying ? colors.primary500 : 'rgba(0,0,0,0)'};
         ${shadow}
         ${props.customCss}
+        opacity: ${isDragging ? 0.4 : 1};
       `}
     >
+      {/* dropRefとpreviewを分けるためにdivでwrap */}
       <div
+        ref={dropRef}
         css={css`
-          display: flex;
-          align-items: flex-start;
+          display: inline-block;
+          width: 100%;
         `}
       >
-        <AdjustHeightToTextarea>
-          <Menu
-            addComment={() => addComment(props.comments.length)}
-            delete={() => props.delete()}
-          />
-        </AdjustHeightToTextarea>
-        <AdjustHeightToTextarea>
-          <Checkbox
-            isChecked={props.isDone}
-            onToggle={() => {
-              props.done(!props.isDone);
-            }}
-            customCss={css`
-              margin-left: 10px;
-            `}
-          />
-        </AdjustHeightToTextarea>
-        <TaskTextarea
-          title={props.title}
-          ref={innerRef}
-          editTitle={props.editTitle}
-          onPressEnter={props.addTask}
-          onPressTab={() => {}}
-          onPressDelete={props.delete}
-          customCss={css`
-            margin-left: 6px;
-            text-decoration: ${props.isDone ? 'line-through' : 'unset'};
-            color: ${props.isDone ? colors.black350 : colors.black500};
-          `}
-        />
-        <AdjustHeightToTextarea
+        <div
           css={css`
-            margin-left: 8px;
+            display: flex;
+            align-items: flex-start;
           `}
         >
-          <TimeControl
-            timesec={props.timesec}
-            isPlaying={props.isPlaying}
-            addSec={(sec, currentSec) => props.addSec(sec, currentSec)}
-            subtractSec={(sec, currentSec) =>
-              props.subtractSec(sec, currentSec)
-            }
-          />
-        </AdjustHeightToTextarea>
-        <AdjustHeightToTextarea
-          css={css`
-            text-align: center;
-          `}
-          onClick={() => (props.isPlaying ? props.pause() : props.play())}
-        >
-          <Icon
-            iconname={!props.isPlaying ? 'play' : 'pause'}
+          <AdjustHeightToTextarea>
+            <div
+              ref={handleRef}
+              css={css`
+                display: inline-block;
+              `}
+            >
+              <Menu
+                addComment={() => addComment(props.comments.length)}
+                delete={() => props.delete()}
+              />
+            </div>
+          </AdjustHeightToTextarea>
+          <AdjustHeightToTextarea>
+            <Checkbox
+              isChecked={props.isDone}
+              onToggle={() => {
+                props.done(!props.isDone);
+              }}
+              customCss={css`
+                margin-left: 10px;
+              `}
+            />
+          </AdjustHeightToTextarea>
+          <TaskTextarea
+            title={props.title}
+            ref={innerRef}
+            editTitle={props.editTitle}
+            onPressEnter={props.addTask}
+            onPressTab={() => {}}
+            onPressDelete={props.delete}
             customCss={css`
-              cursor: pointer;
-              width: 12px;
-              margin-left: 12px;
-              visibility: ${props.isDone ? 'hidden' : 'visible'};
+              margin-left: 6px;
+              text-decoration: ${props.isDone ? 'line-through' : 'unset'};
+              color: ${props.isDone ? colors.black350 : colors.black500};
             `}
           />
-        </AdjustHeightToTextarea>
-      </div>
-      {props.comments.length > 0 ? (
-        <React.Fragment>
-          <hr
+          <AdjustHeightToTextarea
             css={css`
-              background-color: ${colors.black100};
-              border: none;
-              height: 1px;
-              margin: 8px 0 0;
-            `}
-          />
-          <div
-            css={css`
-              padding: 6px 8px 0 24px;
+              margin-left: 8px;
             `}
           >
-            {props.comments.map((comment, i) => (
-              <div
-                css={css`
-                  margin-top: ${i !== 0 ? '2px' : 0};
-                `}
-                key={i}
-              >
-                <Comment
-                  comment={comment}
-                  editComment={comment => editComment(comment, i)}
-                  delete={() => deleteComment(i)}
-                  generateNextComment={() => addComment(i + 1)}
-                  toPrevComment={() => focusPrevComment(i)}
-                  toNextComment={() => focusNextComment(i)}
-                  focus={i === focusCommentIndex}
-                />
-              </div>
-            ))}
-          </div>
-        </React.Fragment>
-      ) : (
-        ''
-      )}
+            <TimeControl
+              timesec={props.timesec}
+              isPlaying={props.isPlaying}
+              addSec={(sec, currentSec) => props.addSec(sec, currentSec)}
+              subtractSec={(sec, currentSec) =>
+                props.subtractSec(sec, currentSec)
+              }
+            />
+          </AdjustHeightToTextarea>
+          <AdjustHeightToTextarea
+            css={css`
+              text-align: center;
+            `}
+            onClick={() => (props.isPlaying ? props.pause() : props.play())}
+          >
+            <Icon
+              iconname={!props.isPlaying ? 'play' : 'pause'}
+              customCss={css`
+                cursor: pointer;
+                width: 12px;
+                margin-left: 12px;
+                visibility: ${props.isDone ? 'hidden' : 'visible'};
+              `}
+            />
+          </AdjustHeightToTextarea>
+        </div>
+        {props.comments.length > 0 ? (
+          <React.Fragment>
+            <hr
+              css={css`
+                background-color: ${colors.black100};
+                border: none;
+                height: 1px;
+                margin: 8px 0 0;
+              `}
+            />
+            <div
+              css={css`
+                padding: 6px 8px 0 24px;
+              `}
+            >
+              {props.comments.map((comment, i) => (
+                <div
+                  css={css`
+                    margin-top: ${i !== 0 ? '2px' : 0};
+                  `}
+                  key={i}
+                >
+                  <Comment
+                    comment={comment}
+                    editComment={comment => editComment(comment, i)}
+                    delete={() => deleteComment(i)}
+                    generateNextComment={() => addComment(i + 1)}
+                    toPrevComment={() => focusPrevComment(i)}
+                    toNextComment={() => focusNextComment(i)}
+                    focus={i === focusCommentIndex}
+                  />
+                </div>
+              ))}
+            </div>
+          </React.Fragment>
+        ) : (
+          ''
+        )}
+      </div>
     </div>
   );
 };

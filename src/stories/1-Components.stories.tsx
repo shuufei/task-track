@@ -190,78 +190,78 @@ export const _Textarea = () => {
   return <Textarea />;
 };
 
-export const _Task = () => {
-  const initialTask: Task = {
-    uuid: '0001',
-    title: '',
-    isDone: false,
-    timesec: 0,
-    isPlaying: false,
-    comments: [],
-    updatedAt: new Date()
-  };
-  const [task, setTask] = useState(initialTask);
-  const setTimesec = (sec: number) => {
-    setTask({
-      ...task,
-      timesec: sec
-    });
-  };
-  const setIsDone = (isDone: boolean) => {
-    setTask({
-      ...task,
-      isDone: isDone,
-      isPlaying: false
-    });
-  };
-  const setIsPlaying = (isPlaying: boolean) => {
-    setTask({
-      ...task,
-      isPlaying: isPlaying
-    });
-  };
-  const setTitle = (title: string) => {
-    setTask({
-      ...task,
-      title
-    });
-  };
-  const setComments = (comments: string[]) => {
-    setTask({
-      ...task,
-      comments
-    });
-  };
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (task.isPlaying) {
-        setTask({
-          ...task,
-          timesec: task.timesec + 1
-        });
-      }
-    }, 1000);
-    return () => {
-      clearInterval(interval);
-    };
-  }, [task]);
-  return (
-    <TaskComponent
-      title={task.title}
-      timesec={task.timesec}
-      isDone={task.isDone}
-      isPlaying={task.isPlaying}
-      comments={task.comments}
-      addSec={(sec, current) => setTimesec(current + sec)}
-      subtractSec={(sec, current) => setTimesec(current - sec)}
-      done={isDone => setIsDone(isDone)}
-      play={() => setIsPlaying(true)}
-      pause={() => setIsPlaying(false)}
-      editTitle={value => setTitle(value)}
-      addComment={() => {}}
-      editComments={comments => setComments(comments)}
-      delete={() => {}}
-      addTask={() => {}}
-    />
-  );
-};
+// export const _Task = () => {
+//   const initialTask: Task = {
+//     uuid: '0001',
+//     title: '',
+//     isDone: false,
+//     timesec: 0,
+//     isPlaying: false,
+//     comments: [],
+//     updatedAt: new Date()
+//   };
+//   const [task, setTask] = useState(initialTask);
+//   const setTimesec = (sec: number) => {
+//     setTask({
+//       ...task,
+//       timesec: sec
+//     });
+//   };
+//   const setIsDone = (isDone: boolean) => {
+//     setTask({
+//       ...task,
+//       isDone: isDone,
+//       isPlaying: false
+//     });
+//   };
+//   const setIsPlaying = (isPlaying: boolean) => {
+//     setTask({
+//       ...task,
+//       isPlaying: isPlaying
+//     });
+//   };
+//   const setTitle = (title: string) => {
+//     setTask({
+//       ...task,
+//       title
+//     });
+//   };
+//   const setComments = (comments: string[]) => {
+//     setTask({
+//       ...task,
+//       comments
+//     });
+//   };
+//   useEffect(() => {
+//     const interval = setInterval(() => {
+//       if (task.isPlaying) {
+//         setTask({
+//           ...task,
+//           timesec: task.timesec + 1
+//         });
+//       }
+//     }, 1000);
+//     return () => {
+//       clearInterval(interval);
+//     };
+//   }, [task]);
+//   return (
+//     <TaskComponent
+//       title={task.title}
+//       timesec={task.timesec}
+//       isDone={task.isDone}
+//       isPlaying={task.isPlaying}
+//       comments={task.comments}
+//       addSec={(sec, current) => setTimesec(current + sec)}
+//       subtractSec={(sec, current) => setTimesec(current - sec)}
+//       done={isDone => setIsDone(isDone)}
+//       play={() => setIsPlaying(true)}
+//       pause={() => setIsPlaying(false)}
+//       editTitle={value => setTitle(value)}
+//       addComment={() => {}}
+//       editComments={comments => setComments(comments)}
+//       delete={() => {}}
+//       addTask={() => {}}
+//     />
+//   );
+// };

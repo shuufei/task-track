@@ -2,6 +2,8 @@ import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 /** @jsx jsx */
 import { jsx, css } from '@emotion/core';
+import { DndProvider } from 'react-dnd';
+import Backend from 'react-dnd-html5-backend';
 
 import { RootState, actionCreator } from 'store';
 import { TaskContainer } from 'components/container/TaskContainer';
@@ -18,19 +20,21 @@ export const TasksPage: React.FC = () => {
         padding: 12px 24px;
       `}
     >
-      {taskUuids.map((uuid, i) => (
-        <TaskContainer
-          uuid={uuid}
-          key={uuid}
-          customCss={
-            i > 0
-              ? css`
-                  margin-top: 6px;
-                `
-              : undefined
-          }
-        />
-      ))}
+      <DndProvider backend={Backend}>
+        {taskUuids.map((uuid, i) => (
+          <TaskContainer
+            uuid={uuid}
+            key={uuid}
+            customCss={
+              i > 0
+                ? css`
+                    margin-top: 6px;
+                  `
+                : undefined
+            }
+          />
+        ))}
+      </DndProvider>
       <div
         onClick={() => dispatch(actionCreator.task.addTask())}
         css={css`

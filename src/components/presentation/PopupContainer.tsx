@@ -67,6 +67,7 @@ export const PopupContainer: React.FC<Props> = props => {
           ${shadow};
           ${props.position === 'left' ? leftPositiong : rightPosition};
           visibility: ${isShown ? 'visible' : 'hidden'};
+          height: ${isShown ? 'auto' : 0};
           animation: ${isShown == null ? '' : isShown ? fadeIn : fadeOut} 0.2s
             ease-out forwards;
           z-index: 2;
@@ -82,15 +83,18 @@ const fadeIn = keyframes`
   0% {
     visibility: hidden;
     opacity: 0;
+    height: auto;
   }
   1% {
     opacity: 0;
     transform: translateY(-2px);
+    height: auto;
   }
   100% {
     visibility: visible;
     opacity: 1;
     transform: translateY(0);
+    height: auto;
   }
 `;
 
@@ -99,15 +103,18 @@ const fadeOut = keyframes`
     visibility: visible;
     opacity: 1;
     transform: translateY(0);
+    height: auto;
   }
   99% {
     opacity: 0;
     transform: translateY(-2px);
+    height: auto;
   }
   100% {
     visibility: hidden;
     opacity: 0;
     transform: translateY(-2px);
+    height: 0;
   }
 `;
 
