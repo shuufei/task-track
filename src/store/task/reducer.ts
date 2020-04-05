@@ -43,10 +43,6 @@ export const reducer = (state: State = initState, action: Actions) => {
           draft.tasks.splice(index, 1);
         }
       });
-    case 'SET_HOVER_TASK_UUID':
-      return produce(state, draft => {
-        draft.hoverTaskUuid = action.payload.uuid;
-      });
     case 'MOVE_TASK':
       return produce(state, draft => {
         const droppedTaskIndex = draft.tasks.findIndex(

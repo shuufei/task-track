@@ -35,7 +35,6 @@ export type Props = {
   done: (isDone: boolean) => void;
   addTask: () => void;
   onHover: (draggedTaskUuid: string) => void;
-  onDragEnd: () => void;
   customCss?: SerializedStyles;
   focus?: boolean;
 };
@@ -84,8 +83,8 @@ export const Task: React.FC<Props> = props => {
   };
 
   const [isDragging, setIsDragging] = useState(false);
-  const handleRef = useRef(null);
-  const dropRef = useRef(null);
+  const handleRef = useRef<HTMLDivElement>(null);
+  const dropRef = useRef<HTMLDivElement>(null);
   const [, connectDrag, previewRef] = useDrag({
     item: { uuid: props.uuid, type: DRAG_TYPE_TASK },
     begin: () => {
@@ -93,12 +92,14 @@ export const Task: React.FC<Props> = props => {
     },
     end: () => {
       setIsDragging(false);
-      props.onDragEnd();
     }
   });
   const [, connectDrop] = useDrop({
     accept: DRAG_TYPE_TASK,
-    hover: (v: DragObjectType) => {
+    hover: (v: DragObjectType, monitor) => {
+      if (!dropRef.current) {
+        return;
+      }
       props.onHover(v.uuid);
     },
     collect: monitor => ({

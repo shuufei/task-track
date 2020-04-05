@@ -16,9 +16,6 @@ export const TaskContainer: React.FC<Props> = props => {
     state.task.tasks.find(v => v.uuid === props.uuid)
   );
   const focusUuid = useSelector((state: RootState) => state.task.focusUuid);
-  const hoverTaskUuid = useSelector(
-    (state: RootState) => state.task.hoverTaskUuid
-  );
   const dispatch = useDispatch();
 
   const updateTask = useCallback(
@@ -103,19 +100,9 @@ export const TaskContainer: React.FC<Props> = props => {
       clearInterval(interval);
     };
   }, [task, updateTask]);
-
-  const updateHoverTaskUuid = useCallback(
-    (uuid: string | undefined) => {
-      if (hoverTaskUuid === uuid) {
-        return;
-      }
-      dispatch(actionCreator.task.setHoverTaskUuid({ uuid }));
-    },
-    [dispatch, hoverTaskUuid]
-  );
   const moveTask = useCallback(
     (draggedTaskUuid: string) => {
-      if (hoverTaskUuid === props.uuid) {
+      if (props.uuid === draggedTaskUuid) {
         return;
       }
       dispatch(
@@ -124,9 +111,8 @@ export const TaskContainer: React.FC<Props> = props => {
           droppedTaskUuid: props.uuid
         })
       );
-      updateHoverTaskUuid(props.uuid);
     },
-    [dispatch, props.uuid, hoverTaskUuid, updateHoverTaskUuid]
+    [dispatch, props.uuid]
   );
 
   return (
@@ -146,12 +132,7 @@ export const TaskContainer: React.FC<Props> = props => {
       addComment={() => {}}
       editComments={comments => updateComments(comments)}
       delete={() => deleteTask()}
-      onHover={draggedTaskUuid => {
-        moveTask(draggedTaskUuid);
-      }}
-      onDragEnd={() => {
-        updateHoverTaskUuid(undefined);
-      }}
+      onHover={moveTask}
       addTask={addTask}
       customCss={props.customCss}
       focus={focusUuid === props.uuid}
