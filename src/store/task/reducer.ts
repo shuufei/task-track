@@ -42,6 +42,9 @@ export const reducer = (state: State = initState, action: Actions) => {
         if (index !== -1) {
           draft.tasks.splice(index, 1);
         }
+        if (index > 0) {
+          draft.focusUuid = draft.tasks[index - 1].uuid;
+        }
       });
     case 'MOVE_TASK':
       return produce(state, draft => {
@@ -70,6 +73,10 @@ export const reducer = (state: State = initState, action: Actions) => {
           return;
         }
         draft.tasks.splice(draggedTaskIndex, 1);
+      });
+    case 'UPDATE_FOCUS_TASK_UUID':
+      return produce(state, draft => {
+        draft.focusUuid = action.payload.uuid;
       });
     default:
       return state;

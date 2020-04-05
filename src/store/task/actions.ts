@@ -21,12 +21,17 @@ export interface MoveDragTaskAction extends Action {
   type: 'MOVE_TASK';
   payload: { draggedTaskUuid: string; droppedTaskUuid: string };
 }
+export interface UpdateFocusTaskUuid extends Action {
+  type: 'UPDATE_FOCUS_TASK_UUID';
+  payload: { uuid: string | undefined };
+}
 export type Actions =
   | AddTaskAction
   | AddTaskByUuidAction
   | UpdateTaskAction
   | DeleteTaskAction
-  | MoveDragTaskAction;
+  | MoveDragTaskAction
+  | UpdateFocusTaskUuid;
 
 /** Action Creators */
 export const addTask = (): AddTaskAction => ({
@@ -56,10 +61,17 @@ export const moveDragTask = (
   type: 'MOVE_TASK',
   payload
 });
+export const updateFocusTaskUuid = (
+  payload: UpdateFocusTaskUuid['payload']
+): UpdateFocusTaskUuid => ({
+  type: 'UPDATE_FOCUS_TASK_UUID',
+  payload
+});
 export const actionCreator = {
   addTask,
   addTaskByUuid,
   updateTask,
   deleteTask,
-  moveDragTask
+  moveDragTask,
+  updateFocusTaskUuid
 };

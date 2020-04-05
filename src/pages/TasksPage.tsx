@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 /** @jsx jsx */
 import { jsx, css } from '@emotion/core';
@@ -14,6 +14,16 @@ export const TasksPage: React.FC = () => {
     state.task.tasks.map(v => v.uuid)
   );
   const dispatch = useDispatch();
+
+  const [initialized, setInitialized] = useState(false);
+  useEffect(() => {
+    if (initialized) {
+      return;
+    }
+    dispatch(actionCreator.task.updateFocusTaskUuid({ uuid: undefined }));
+    setInitialized(true);
+  }, [dispatch, initialized, setInitialized]);
+
   return (
     <div
       css={css`
