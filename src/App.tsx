@@ -4,7 +4,6 @@ import { jsx, css } from '@emotion/core';
 
 import './App.css';
 import {
-  Link,
   Switch,
   BrowserRouter as Router,
   Route,
@@ -12,33 +11,41 @@ import {
 } from 'react-router-dom';
 import { TasksPage } from './pages/TasksPage';
 import { ReportPage } from './pages/ReportPage';
+import {
+  Navigation,
+  NAVIGATION_HEIGHT
+} from 'components/presentation/Navigation';
 
 const App: React.FC = () => (
   <Router>
-    <div>
-      <nav>
-        <ul>
-          <li>
-            <Link to="/tasks">Tasks</Link>
-          </li>
-          <li>
-            <Link to="/report">Report</Link>
-          </li>
-        </ul>
-      </nav>
-    </div>
+    <Navigation />
 
-    <Switch>
-      <Route path="/tasks">
-        <TasksPage />
-      </Route>
-      <Route path="/report">
-        <ReportPage />
-      </Route>
-      <Route path="/">
-        <Redirect to={{ pathname: '/tasks' }} />
-      </Route>
-    </Switch>
+    <div
+      css={css`
+        display: flex;
+        justify-content: center;
+      `}
+    >
+      <div
+        css={css`
+          margin-top: ${NAVIGATION_HEIGHT + 8}px;
+          max-width: 700px;
+          width: 100%;
+        `}
+      >
+        <Switch>
+          <Route path="/tasks">
+            <TasksPage />
+          </Route>
+          <Route path="/report">
+            <ReportPage />
+          </Route>
+          <Route path="/">
+            <Redirect to={{ pathname: '/tasks' }} />
+          </Route>
+        </Switch>
+      </div>
+    </div>
   </Router>
 );
 
