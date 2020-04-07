@@ -1,7 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 /** @jsx jsx */
 import { jsx, css, SerializedStyles } from '@emotion/core';
-import { useDrag, useDrop, DragObjectWithType } from 'react-dnd';
+import {
+  useDrag,
+  useDrop,
+  DragObjectWithType,
+  DragElementWrapper,
+  DragPreviewOptions
+} from 'react-dnd';
 
 import { colors } from 'styles/color';
 import { shadow } from 'styles/shadow';
@@ -16,6 +22,45 @@ import { TaskTextarea } from './TaskTextare';
 export const DRAG_TYPE_TASK = 'TASK';
 
 type DragObjectType = DragObjectWithType & { uuid: string };
+
+const useTaskDragDrop = (
+  taskUuid: string,
+  onHover: (draggedTaskUuid: string) => void
+): [
+  React.RefObject<HTMLDivElement>,
+  React.RefObject<HTMLDivElement>,
+  DragElementWrapper<DragPreviewOptions>,
+  boolean
+] => {
+  const [isDragging, setIsDragging] = useState(false);
+  const handleRef = useRef<HTMLDivElement>(null);
+  const dropRef = useRef<HTMLDivElement>(null);
+  const [, connectDrag, previewRef] = useDrag({
+    item: { uuid: taskUuid, type: DRAG_TYPE_TASK },
+    begin: () => {
+      setIsDragging(true);
+    },
+    end: () => {
+      setIsDragging(false);
+    }
+  });
+  const [, connectDrop] = useDrop({
+    accept: DRAG_TYPE_TASK,
+    hover: (v: DragObjectType, monitor) => {
+      if (!dropRef.current) {
+        return;
+      }
+      onHover(v.uuid);
+      // props.onHover(v.uuid);
+    },
+    collect: monitor => ({
+      isOver: !!monitor.isOver()
+    })
+  });
+  connectDrag(handleRef);
+  connectDrop(dropRef);
+  return [handleRef, dropRef, previewRef, isDragging];
+};
 
 export type Props = {
   uuid: string;
@@ -82,33 +127,10 @@ export const Task: React.FC<Props> = props => {
     );
   };
 
-  // TODO: CustomHooksとして定義できないか
-  const [isDragging, setIsDragging] = useState(false);
-  const handleRef = useRef<HTMLDivElement>(null);
-  const dropRef = useRef<HTMLDivElement>(null);
-  const [, connectDrag, previewRef] = useDrag({
-    item: { uuid: props.uuid, type: DRAG_TYPE_TASK },
-    begin: () => {
-      setIsDragging(true);
-    },
-    end: () => {
-      setIsDragging(false);
-    }
-  });
-  const [, connectDrop] = useDrop({
-    accept: DRAG_TYPE_TASK,
-    hover: (v: DragObjectType, monitor) => {
-      if (!dropRef.current) {
-        return;
-      }
-      props.onHover(v.uuid);
-    },
-    collect: monitor => ({
-      isOver: !!monitor.isOver()
-    })
-  });
-  connectDrag(handleRef);
-  connectDrop(dropRef);
+  const [handleRef, dropRef, previewRef, isDragging] = useTaskDragDrop(
+    props.uuid,
+    props.onHover
+  );
 
   return (
     <div
