@@ -1,6 +1,7 @@
 export const colors = {
   primary500: '#2F80ED',
-  primary400: '#5999E3',
+  primary400: '#4296ec',
+  primaryDark: '#4384c7',
   red500: '#EB5757',
   green500: '#27AE60',
   black500: '#202020',

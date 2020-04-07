@@ -1,4 +1,4 @@
-import { convertToTimeFormatFromSec } from './TimeField';
+import { convertToTimeFormatFromSec } from './time';
 
 describe('秒からHH:mm:ssへの変換処理', () => {
   test('正しい形式に変換される', () => {

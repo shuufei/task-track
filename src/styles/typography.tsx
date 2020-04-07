@@ -2,14 +2,14 @@ import { css } from '@emotion/core';
 
 import { colors } from './color';
 
-const lato = '"Lato", sans-serif';
-const weight = {
+export const lato = '"Lato", sans-serif';
+export const weight = {
   light: 300,
   regular: 400,
   bold: 700,
   black: 900
 };
-const size = {
+export const size = {
   m: '14px',
   s: '12px',
   ss: '9px'

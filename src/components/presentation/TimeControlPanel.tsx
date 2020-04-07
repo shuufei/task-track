@@ -4,7 +4,7 @@ import { jsx, css } from '@emotion/core';
 
 import { colors } from 'styles/color';
 import * as typography from 'styles/typography';
-import { MAX_SEC, MIN_SEC } from './TimeField';
+import { MAX_SEC, MIN_SEC } from 'util/time';
 
 export type Props = {
   timesec: number;
