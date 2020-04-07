@@ -50,7 +50,7 @@ export const Navigation: React.FC = () => {
       <ul
         css={css`
           display: flex;
-          padding: 8px;
+          padding: 6px 8px;
           margin: 0;
           list-style: none;
         `}

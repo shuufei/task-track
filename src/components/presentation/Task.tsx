@@ -82,6 +82,7 @@ export const Task: React.FC<Props> = props => {
     );
   };
 
+  // TODO: CustomHooksとして定義できないか
   const [isDragging, setIsDragging] = useState(false);
   const handleRef = useRef<HTMLDivElement>(null);
   const dropRef = useRef<HTMLDivElement>(null);
@@ -171,7 +172,7 @@ export const Task: React.FC<Props> = props => {
             customCss={css`
               margin-left: 6px;
               text-decoration: ${props.isDone ? 'line-through' : 'unset'};
-              color: ${props.isDone ? colors.black350 : colors.black500};
+              opacity: ${props.isDone ? 0.3 : 1};
             `}
           />
           <AdjustHeightToTextarea
