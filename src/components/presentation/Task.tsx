@@ -194,7 +194,7 @@ export const Task: React.FC<Props> = props => {
             customCss={css`
               margin-left: 6px;
               text-decoration: ${props.isDone ? 'line-through' : 'unset'};
-              opacity: ${props.isDone ? 0.3 : 1};
+              color: ${props.isDone ? 'rgba(0,0,0,0.3)' : colors.black500};
             `}
           />
           <AdjustHeightToTextarea

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 /** @jsx jsx */
 import { jsx, css, SerializedStyles, keyframes } from '@emotion/core';
 
@@ -15,14 +15,33 @@ export type Props = {
 };
 
 export const TaskReport: React.FC<Props> = props => {
-  const [isHover, setIsHover] = useState(false);
-  const width = (props.timesec / props.maxTimesec) * 100;
-  const time = convertToTimeFormatFromSec(props.timesec);
   const ANIMATION_DURATION_SEC = 0.8;
   const ANIMATION_DELAY_SEC = 0.4;
+  const TIME_LABEL_SIDE_MARGIN = 8;
+  const CHART_BAR_MIN_WIDTH_PX = 5;
+
+  const [isHover, setIsHover] = useState(false);
+  const [widthPx, setWidthPx] = useState(0);
+  const selfRef = useRef<HTMLDivElement>(null);
+  const timeLabelRef = useRef<HTMLLabelElement>(null);
+  useEffect(() => {
+    if (selfRef.current == null || selfRef.current == null) {
+      return;
+    }
+    const selfRect = selfRef.current.getBoundingClientRect();
+    const timeLabelRect = timeLabelRef.current?.getBoundingClientRect();
+    const maxWidthPx =
+      selfRect.width - (timeLabelRect!.width + TIME_LABEL_SIDE_MARGIN * 2);
+    setWidthPx((props.timesec / props.maxTimesec) * maxWidthPx);
+  }, [widthPx, setWidthPx, props.maxTimesec, props.timesec]);
+
+  const time = convertToTimeFormatFromSec(props.timesec);
   return (
     <div
-      css={props.customCss}
+      ref={selfRef}
+      css={css`
+        ${props.customCss};
+      `}
       onMouseEnter={() => setIsHover(true)}
       onMouseLeave={() => setIsHover(false)}
     >
@@ -36,7 +55,9 @@ export const TaskReport: React.FC<Props> = props => {
       </span>
       <div
         css={css`
-          width: ${width > 1 ? width : 1}%;
+          width: ${widthPx > CHART_BAR_MIN_WIDTH_PX || widthPx === 0
+            ? widthPx
+            : CHART_BAR_MIN_WIDTH_PX}px;
           height: 24px;
           margin-top: 4px;
           position: relative;
@@ -55,16 +76,17 @@ export const TaskReport: React.FC<Props> = props => {
           `}
         ></div>
         <label
+          ref={timeLabelRef}
           css={css`
             position: absolute;
             top: 50%;
             right: 0;
-            transform: translate(calc(100% + 8px), -50%);
+            transform: translate(
+              calc(100% + ${TIME_LABEL_SIDE_MARGIN}px),
+              -50%
+            );
             ${typography.caption};
-            font-weight: ${isHover
-              ? typography.weight.bold
-              : typography.weight.regular};
-            color: ${isHover ? colors.primaryDark : colors.black300};
+            color: ${isHover ? colors.black500 : colors.black300};
             opacity: 0;
             animation: ${fadeIn} 0.2s
               ${ANIMATION_DURATION_SEC + ANIMATION_DELAY_SEC}s ease-out forwards;

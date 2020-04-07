@@ -6,6 +6,7 @@ import { useSelector } from 'react-redux';
 import { colors } from 'styles/color';
 import { TaskReportContainer } from 'components/container/TaskReportContainer';
 import { RootState } from 'store';
+import { shadow } from 'styles/shadow';
 
 export const ReportPage: React.FC = () => {
   const taskUuids = useSelector((state: RootState) =>
@@ -26,7 +27,11 @@ export const ReportPage: React.FC = () => {
       css={css`
         display: flex;
         align-items: stretch;
-        padding: 12px 16px;
+        padding: 24px;
+        margin-top: 12px;
+        background-color: ${colors.white};
+        border-radius: 5px;
+        ${shadow};
       `}
     >
       <div
