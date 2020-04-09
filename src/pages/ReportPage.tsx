@@ -7,6 +7,7 @@ import { colors } from 'styles/color';
 import { TaskReportContainer } from 'components/container/TaskReportContainer';
 import { RootState } from 'store';
 import { shadow } from 'styles/shadow';
+import * as typography from 'styles/typography';
 
 export const ReportPage: React.FC = () => {
   const taskUuids = useSelector((state: RootState) =>
@@ -34,33 +35,47 @@ export const ReportPage: React.FC = () => {
         ${shadow};
       `}
     >
-      <div
-        css={css`
-          width: 1px;
-          background-color: ${colors.black300};
-        `}
-      />
-      <div
-        css={css`
-          flex: 1;
-          padding: 0 0 16px;
-        `}
-      >
-        {taskUuids.map((uuid, i) => (
-          <TaskReportContainer
-            uuid={uuid}
-            key={uuid}
-            maxTimesec={maxTimesec}
-            customCss={
-              i > 0
-                ? css`
-                    margin-top: 16px;
-                  `
-                : undefined
-            }
+      {taskUuids.length === 0 ? (
+        <p
+          css={css`
+            ${typography.base};
+            color: ${colors.black400};
+            margin: 0;
+          `}
+        >
+          No tracking record.
+        </p>
+      ) : (
+        <React.Fragment>
+          <div
+            css={css`
+              width: 1px;
+              background-color: ${colors.black300};
+            `}
           />
-        ))}
-      </div>
+          <div
+            css={css`
+              flex: 1;
+              padding: 0 0 16px;
+            `}
+          >
+            {taskUuids.map((uuid, i) => (
+              <TaskReportContainer
+                uuid={uuid}
+                key={uuid}
+                maxTimesec={maxTimesec}
+                customCss={
+                  i > 0
+                    ? css`
+                        margin-top: 16px;
+                      `
+                    : undefined
+                }
+              />
+            ))}
+          </div>
+        </React.Fragment>
+      )}
     </div>
   );
 };

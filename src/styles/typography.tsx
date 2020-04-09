@@ -10,6 +10,7 @@ export const weight = {
   black: 900
 };
 export const size = {
+  l: '16px',
   m: '14px',
   s: '12px',
   ss: '9px'
