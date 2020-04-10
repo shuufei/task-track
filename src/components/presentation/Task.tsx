@@ -25,14 +25,13 @@ type DragObjectType = DragObjectWithType & { uuid: string };
 
 const useTaskDragDrop = (
   taskUuid: string,
-  onHover: (draggedTaskUuid: string) => void
+  onHover: (draggedTaskUuid: string) => void,
+  setIsDragging: (isDragging: boolean) => void
 ): [
   React.RefObject<HTMLDivElement>,
   React.RefObject<HTMLDivElement>,
-  DragElementWrapper<DragPreviewOptions>,
-  boolean
+  DragElementWrapper<DragPreviewOptions>
 ] => {
-  const [isDragging, setIsDragging] = useState(false);
   const handleRef = useRef<HTMLDivElement>(null);
   const dropRef = useRef<HTMLDivElement>(null);
   const [, connectDrag, previewRef] = useDrag({
@@ -51,7 +50,9 @@ const useTaskDragDrop = (
         return;
       }
       onHover(v.uuid);
-      // props.onHover(v.uuid);
+    },
+    drop: () => {
+      setIsDragging(false);
     },
     collect: monitor => ({
       isOver: !!monitor.isOver()
@@ -59,7 +60,7 @@ const useTaskDragDrop = (
   });
   connectDrag(handleRef);
   connectDrop(dropRef);
-  return [handleRef, dropRef, previewRef, isDragging];
+  return [handleRef, dropRef, previewRef];
 };
 
 export type Props = {
@@ -85,6 +86,7 @@ export type Props = {
 };
 
 export const Task: React.FC<Props> = props => {
+  const [isDragging, setIsDragging] = useState(false);
   const [focusCommentIndex, setFocusCommentIndex] = useState<number | null>(
     null
   );
@@ -127,9 +129,15 @@ export const Task: React.FC<Props> = props => {
     );
   };
 
-  const [handleRef, dropRef, previewRef, isDragging] = useTaskDragDrop(
+  const [handleRef, dropRef, previewRef] = useTaskDragDrop(
     props.uuid,
-    props.onHover
+    draggedTaskUuid => {
+      if (draggedTaskUuid === props.uuid) {
+        setIsDragging(true);
+      }
+      props.onHover(draggedTaskUuid);
+    },
+    setIsDragging
   );
 
   return (

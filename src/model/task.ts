@@ -9,9 +9,10 @@ export type Task = {
   comments: string[];
   timesecUpdatedTimestamp?: number;
   updatedAt: Date;
+  sectionId?: string;
 };
 
-export const generateTask = () => ({
+export const generateTask = (): Task => ({
   uuid: uuidv4(),
   title: '',
   isDone: false,

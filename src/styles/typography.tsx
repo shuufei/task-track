@@ -29,3 +29,9 @@ export const caption = css`
   ${base};
   font-size: ${size.s};
 `;
+
+export const title = css`
+  ${base};
+  font-size: ${size.l};
+  font-weight: ${weight.bold};
+`;

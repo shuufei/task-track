@@ -1,10 +1,11 @@
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, useContext } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { SerializedStyles } from '@emotion/core';
 
 import { Task } from 'components/presentation/Task';
 import { RootState, actionCreator } from 'store';
 import { Task as TaskType } from 'model/task';
-import { SerializedStyles } from '@emotion/core';
+import { SectionIdContext } from 'pages/TasksPage';
 
 export type Props = {
   uuid: string;
@@ -17,6 +18,7 @@ export const TaskContainer: React.FC<Props> = props => {
   );
   const focusUuid = useSelector((state: RootState) => state.task.focusUuid);
   const dispatch = useDispatch();
+  const sectionId = useContext(SectionIdContext);
 
   const updateTask = useCallback(
     (task: TaskType) => {
@@ -74,10 +76,17 @@ export const TaskContainer: React.FC<Props> = props => {
     });
   };
   const deleteTask = () => {
-    dispatch(actionCreator.task.deleteTask({ uuid: props.uuid }));
+    dispatch(actionCreator.task.deleteTask({ uuid: props.uuid, sectionId }));
   };
   const addTask = () => {
-    dispatch(actionCreator.task.addTaskByUuid({ uuid: props.uuid }));
+    sectionId != null
+      ? dispatch(
+          actionCreator.task.addTaskByUuidToSection({
+            uuid: props.uuid,
+            sectionId
+          })
+        )
+      : dispatch(actionCreator.task.addTaskByUuid({ uuid: props.uuid }));
   };
   useEffect(() => {
     const interval = setInterval(() => {
