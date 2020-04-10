@@ -7,9 +7,9 @@ import Backend from 'react-dnd-html5-backend';
 
 import { RootState, actionCreator } from 'store';
 import { TaskContainer } from 'components/container/TaskContainer';
-import { Icon } from 'components/presentation/Icon';
 import * as typography from 'styles/typography';
 import { colors } from 'styles/color';
+import { AddItem } from 'components/presentation/AddItem';
 
 export const TasksPage: React.FC = () => {
   const taskUuids = useSelector((state: RootState) =>
@@ -59,7 +59,6 @@ export const TasksPage: React.FC = () => {
         </p>
       )}
       <div
-        onClick={() => dispatch(actionCreator.task.addTask())}
         css={css`
           margin-top: 12px;
           padding: 4px;
@@ -67,7 +66,10 @@ export const TasksPage: React.FC = () => {
           cursor: pointer;
         `}
       >
-        <Icon iconname={'plus'} />
+        <AddItem
+          addTask={() => dispatch(actionCreator.task.addTask())}
+          addSection={() => {}}
+        />
       </div>
     </div>
   );
