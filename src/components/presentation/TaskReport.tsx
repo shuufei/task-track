@@ -5,6 +5,7 @@ import { jsx, css, SerializedStyles, keyframes } from '@emotion/core';
 import { colors } from 'styles/color';
 import * as typography from 'styles/typography';
 import { convertToTimeFormatFromSec } from 'util/time';
+import { Icon } from './Icon';
 
 export type Props = {
   title: string;
@@ -22,6 +23,7 @@ export const TaskReport: React.FC<Props> = props => {
 
   const [isHover, setIsHover] = useState(false);
   const [widthPx, setWidthPx] = useState(0);
+  const [isOpenComments, setIsOpenComments] = useState(false);
   const selfRef = useRef<HTMLDivElement>(null);
   const timeLabelRef = useRef<HTMLLabelElement>(null);
   useEffect(() => {
@@ -45,21 +47,75 @@ export const TaskReport: React.FC<Props> = props => {
       onMouseEnter={() => setIsHover(true)}
       onMouseLeave={() => setIsHover(false)}
     >
-      <span
-        css={css`
-          ${typography.caption};
-          margin-left: 6px;
-        `}
-      >
-        {props.title}
-      </span>
+      <div>
+        <span
+          css={css`
+            ${typography.caption};
+            margin-left: 6px;
+          `}
+        >
+          {props.title}
+        </span>
+        {props.comments.length > 0 && (
+          <div
+            css={css`
+              display: inline-block;
+              cursor: pointer;
+            `}
+            onClick={() => setIsOpenComments(!isOpenComments)}
+          >
+            <span
+              css={css`
+                margin-left: 16px;
+                ${typography.caption};
+                color: ${colors.black350};
+              `}
+            >
+              {isOpenComments ? 'Hidden Comments' : 'Show Comments'}
+            </span>
+            <Icon
+              iconname={'arrowDown'}
+              customCss={css`
+                width: 9px;
+                margin-left: 4px;
+                transform: ${isOpenComments ? 'rotate(180deg)' : 'none'};
+              `}
+            />
+          </div>
+        )}
+      </div>
+      {isOpenComments && (
+        <div
+          css={css`
+            display: flex;
+            flex-direction: column;
+            padding: 0 6px;
+            ${typography.caption};
+            color: ${colors.black400};
+          `}
+        >
+          {props.comments.map((v, i) => (
+            <div
+              css={css`
+                display: flex;
+                align-items: flex-start;
+                margin-top: 6px;
+              `}
+              key={i}
+            >
+              <span>・</span>
+              <span>{v}</span>
+            </div>
+          ))}
+        </div>
+      )}
       <div
         css={css`
           width: ${widthPx > CHART_BAR_MIN_WIDTH_PX || widthPx === 0
             ? widthPx
             : CHART_BAR_MIN_WIDTH_PX}px;
           height: 24px;
-          margin-top: 4px;
+          margin-top: 6px;
           position: relative;
         `}
       >

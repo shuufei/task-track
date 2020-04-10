@@ -7,7 +7,9 @@ export const ICONS = {
   pause: 'icons/pause.svg',
   menu: 'icons/menu.svg',
   close: 'icons/close.svg',
-  plus: 'icons/plus.svg'
+  plus: 'icons/plus.svg',
+  arrowUp: 'icons/arrow-up.svg',
+  arrowDown: 'icons/arrow-down.svg'
 };
 
 export type Props = {
