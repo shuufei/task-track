@@ -15,6 +15,7 @@ export const PopupContainer: React.FC<Props> = props => {
   // TODO: こんなにuseCallback使って書かないといけないもんなのか調べる
 
   const [isShown, setIsShown] = useState<boolean | null>(null);
+  const [isInitialized, setIsInitialized] = useState(false);
   const popupRef = useRef<HTMLDivElement>(null);
 
   let documentClickHandler: (
@@ -44,10 +45,13 @@ export const PopupContainer: React.FC<Props> = props => {
     document.addEventListener('click', documentClickHandler);
   };
   useEffect(() => {
+    if (!isInitialized) {
+      setIsInitialized(true);
+    }
     return () => {
       document.removeEventListener('click', documentClickHandler);
     };
-  }, [documentClickHandler]);
+  }, [documentClickHandler, isInitialized, setIsInitialized]);
   return (
     <div
       css={css`
@@ -63,7 +67,7 @@ export const PopupContainer: React.FC<Props> = props => {
         css={css`
           position: absolute;
           top: calc(100% + 4px);
-          display: inline-block;
+          display: ${isInitialized ? 'inline-block' : 'none'};
           ${shadow};
           ${props.position === 'left' ? leftPositiong : rightPosition};
           visibility: ${isShown ? 'visible' : 'hidden'};
