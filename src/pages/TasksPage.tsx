@@ -28,12 +28,12 @@ export const TasksPage: React.FC = () => {
       dispatch(actionCreator.task.addSection());
     }
     setInitialized(true);
-  }, [dispatch, initialized, setInitialized]);
+  }, [dispatch, initialized, setInitialized, sectionIds]);
 
   return (
     <div
       css={css`
-        padding: 12px 24px;
+        padding: 12px 24px 24px;
       `}
     >
       {sectionIds.map(v => (

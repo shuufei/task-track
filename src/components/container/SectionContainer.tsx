@@ -36,7 +36,7 @@ export const SectionContainer: React.FC<Props> = props => {
       <div
         css={css`
           position: relative;
-          z-index: 10;
+          z-index: 1;
           line-height: 1;
           display: flex;
           align-items: center;
@@ -85,7 +85,7 @@ export const SectionContainer: React.FC<Props> = props => {
         uuids={sectionTaskUuids}
         customCss={css`
           margin-top: 4px;
-          z-index: 1;
+          z-index: 0;
         `}
       />
     </div>
