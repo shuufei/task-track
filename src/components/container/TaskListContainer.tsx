@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 /** @jsx jsx */
-import { jsx, css } from '@emotion/core';
+import { jsx, css, SerializedStyles } from '@emotion/core';
 import { DndProvider } from 'react-dnd';
 import Backend from 'react-dnd-html5-backend';
 
@@ -12,13 +12,14 @@ import { SectionIdContext } from 'pages/TasksPage';
 
 export type Props = {
   uuids: string[];
+  customCss?: SerializedStyles;
 };
 
 export const TaskListContainer: React.FC<Props> = props => {
   const dispatch = useDispatch();
   const sectionId = useContext(SectionIdContext);
   return (
-    <React.Fragment>
+    <div css={props.customCss}>
       <DndProvider backend={Backend}>
         {props.uuids.map((uuid, i) => (
           <TaskContainer
@@ -49,6 +50,6 @@ export const TaskListContainer: React.FC<Props> = props => {
       >
         <Icon iconname={'plus'} />
       </div>
-    </React.Fragment>
+    </div>
   );
 };

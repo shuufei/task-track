@@ -30,16 +30,20 @@ export interface MoveDragTaskAction extends Action {
   type: 'MOVE_TASK';
   payload: { draggedTaskUuid: string; droppedTaskUuid: string };
 }
-export interface UpdateFocusTaskUuid extends Action {
+export interface UpdateFocusTaskUuidAction extends Action {
   type: 'UPDATE_FOCUS_TASK_UUID';
   payload: { uuid: string | undefined };
 }
-export interface AddSection extends Action {
+export interface AddSectionAction extends Action {
   type: 'ADD_SECTION';
 }
-export interface UpdateSectionTitle extends Action {
+export interface UpdateSectionTitleAction extends Action {
   type: 'UPDATE_SECTION_TITLE';
   payload: Section;
+}
+export interface DeleteSectionAction extends Action {
+  type: 'DELETE_SECTION';
+  payload: { sectionId: string };
 }
 export type Actions =
   | AddTaskAction
@@ -49,9 +53,10 @@ export type Actions =
   | UpdateTaskAction
   | DeleteTaskAction
   | MoveDragTaskAction
-  | UpdateFocusTaskUuid
-  | AddSection
-  | UpdateSectionTitle;
+  | UpdateFocusTaskUuidAction
+  | AddSectionAction
+  | UpdateSectionTitleAction
+  | DeleteSectionAction;
 
 /** Action Creators */
 export const addTask = (): AddTaskAction => ({
@@ -94,17 +99,20 @@ export const moveDragTask = (
   payload
 });
 export const updateFocusTaskUuid = (
-  payload: UpdateFocusTaskUuid['payload']
-): UpdateFocusTaskUuid => ({
+  payload: UpdateFocusTaskUuidAction['payload']
+): UpdateFocusTaskUuidAction => ({
   type: 'UPDATE_FOCUS_TASK_UUID',
   payload
 });
-export const addSection = (): AddSection => ({
+export const addSection = (): AddSectionAction => ({
   type: 'ADD_SECTION'
 });
 export const updateSectionTitle = (
-  payload: UpdateSectionTitle['payload']
-): UpdateSectionTitle => ({ type: 'UPDATE_SECTION_TITLE', payload });
+  payload: UpdateSectionTitleAction['payload']
+): UpdateSectionTitleAction => ({ type: 'UPDATE_SECTION_TITLE', payload });
+export const deleteSection = (
+  payload: DeleteSectionAction['payload']
+): DeleteSectionAction => ({ type: 'DELETE_SECTION', payload });
 export const actionCreator = {
   addTask,
   addTaskToSection,
@@ -115,5 +123,6 @@ export const actionCreator = {
   moveDragTask,
   updateFocusTaskUuid,
   addSection,
-  updateSectionTitle
+  updateSectionTitle,
+  deleteSection
 };

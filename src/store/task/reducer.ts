@@ -123,6 +123,16 @@ export const reducer = (state: State = initState, action: Actions) => {
         }
         section.title = action.payload.title;
       });
+    case 'DELETE_SECTION':
+      return produce(state, draft => {
+        const index = draft.sections.findIndex(
+          v => v.id === action.payload.sectionId
+        );
+        if (index === -1) {
+          return;
+        }
+        draft.sections.splice(index, 1);
+      });
     default:
       return state;
   }

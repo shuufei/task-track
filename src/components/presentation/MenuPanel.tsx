@@ -6,8 +6,8 @@ import { colors } from 'styles/color';
 import * as typography from 'styles/typography';
 
 export type Props = {
-  addComments: (...args: any[]) => void;
-  delete: (...args: any[]) => void;
+  addComments?: (...args: any[]) => void;
+  delete?: (...args: any[]) => void;
 };
 
 export const MenuPanel: React.FC<Props> = props => {
@@ -19,19 +19,28 @@ export const MenuPanel: React.FC<Props> = props => {
         background-color: ${colors.black100};
       `}
     >
-      <button css={buttonStyle} onClick={() => props.addComments()}>
-        Add Comment
-      </button>
-      <button
-        css={css`
-          ${buttonStyle}
-          margin-top: 4px;
-          color: ${colors.red500};
-        `}
-        onClick={() => props.delete()}
-      >
-        Delete
-      </button>
+      {props.addComments != null && (
+        <button
+          css={buttonStyle}
+          onClick={() =>
+            props.addComments != null ? props.addComments() : null
+          }
+        >
+          Add Comment
+        </button>
+      )}
+      {props.delete != null && (
+        <button
+          css={css`
+            ${buttonStyle}
+            margin-top: ${props.addComments != null ? '4px' : 0};
+            color: ${colors.red500};
+          `}
+          onClick={() => (props.delete != null ? props.delete() : null)}
+        >
+          Delete
+        </button>
+      )}
     </div>
   );
 };

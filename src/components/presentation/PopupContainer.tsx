@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 /** @jsx jsx */
-import { jsx, css, keyframes } from '@emotion/core';
+import { jsx, css, keyframes, SerializedStyles } from '@emotion/core';
 
 import { shadow } from 'styles/shadow';
 
@@ -9,6 +9,7 @@ export type Props = {
   popup: JSX.Element;
   keep?: boolean;
   position?: 'right' | 'left';
+  custonCss?: SerializedStyles;
 };
 
 export const PopupContainer: React.FC<Props> = props => {
@@ -58,6 +59,7 @@ export const PopupContainer: React.FC<Props> = props => {
         display: inline-block;
         line-height: 0;
         position: relative;
+        ${props.custonCss};
       `}
       onClick={handleToggleButtonClick}
       ref={popupRef}
