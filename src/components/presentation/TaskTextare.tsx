@@ -34,7 +34,7 @@ export const TaskTextarea = React.forwardRef<Handler, Props>((props, ref) => {
   };
   return (
     <Textarea
-      placeholder={'Input Task'}
+      placeholder={'Task Title'}
       value={props.title}
       ref={ref}
       changeValue={value => props.editTitle(value)}

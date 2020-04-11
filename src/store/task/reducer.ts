@@ -132,6 +132,16 @@ export const reducer = (state: State = initState, action: Actions) => {
           return;
         }
         draft.sections.splice(index, 1);
+        const sectionTasks = draft.tasks.filter(
+          v => v.sectionId === action.payload.sectionId
+        );
+        sectionTasks.forEach(v => {
+          const taskIndex = draft.tasks.findIndex(t => t.uuid === v.uuid);
+          if (taskIndex === -1) {
+            return;
+          }
+          draft.tasks.splice(taskIndex, 1);
+        });
       });
     default:
       return state;

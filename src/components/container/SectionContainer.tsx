@@ -69,7 +69,7 @@ export const SectionContainer: React.FC<Props> = props => {
               })
             )
           }
-          placeholder={'Input Section Title'}
+          placeholder={'Enter Section Title'}
           customCss={css`
             ${typography.title};
             background-color: rgba(0, 0, 0, 0);

@@ -5,16 +5,14 @@ import { jsx, css } from '@emotion/core';
 
 import { RootState, actionCreator } from 'store';
 import { SectionContainer } from 'components/container/SectionContainer';
-import { TaskListContainer } from 'components/container/TaskListContainer';
+import * as typography from 'styles/typography';
+import { colors } from 'styles/color';
 
 export const SectionIdContext = React.createContext<string | undefined>(
   undefined
 );
 
 export const TasksPage: React.FC = () => {
-  const taskUuids = useSelector((state: RootState) =>
-    state.task.tasks.filter(v => v.sectionId == null).map(v => v.uuid)
-  );
   const sectionIds = useSelector((state: RootState) =>
     state.task.sections.map(v => v.id)
   );
@@ -26,6 +24,9 @@ export const TasksPage: React.FC = () => {
       return;
     }
     dispatch(actionCreator.task.updateFocusTaskUuid({ uuid: undefined }));
+    if (sectionIds.length === 0) {
+      dispatch(actionCreator.task.addSection());
+    }
     setInitialized(true);
   }, [dispatch, initialized, setInitialized]);
 
@@ -35,9 +36,6 @@ export const TasksPage: React.FC = () => {
         padding: 12px 24px;
       `}
     >
-      <SectionIdContext.Provider value={undefined}>
-        <TaskListContainer uuids={taskUuids} />
-      </SectionIdContext.Provider>
       {sectionIds.map(v => (
         <SectionIdContext.Provider value={v} key={v}>
           <SectionContainer
@@ -48,6 +46,26 @@ export const TasksPage: React.FC = () => {
           />
         </SectionIdContext.Provider>
       ))}
+      <button
+        css={css`
+          margin-top: 32px;
+          padding: 6px 12px;
+          outline: none;
+          border: none;
+          border-radius: 3px;
+          background-color: ${colors.black400};
+          cursor: pointer;
+          ${typography.caption};
+          color: ${colors.white};
+          font-weight: ${typography.weight.bold};
+          :hover {
+            filter: brightness(0.8);
+          }
+        `}
+        onClick={() => dispatch(actionCreator.task.addSection())}
+      >
+        Add Section
+      </button>
     </div>
   );
 };
