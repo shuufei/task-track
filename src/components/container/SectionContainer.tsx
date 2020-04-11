@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 /** @jsx jsx */
 import { jsx, css, SerializedStyles } from '@emotion/core';
 
@@ -8,11 +8,16 @@ import { useSelector, useDispatch } from 'react-redux';
 import { RootState, actionCreator } from 'store';
 import { TaskListContainer } from './TaskListContainer';
 import { Menu } from 'components/presentation/Menu';
+import { useDrag, useDrop, DragObjectWithType } from 'react-dnd';
 
 export type Props = {
   sectionId: string;
   customCss?: SerializedStyles;
 };
+
+export const DRAG_TYPE_SECTION = 'SECTION';
+
+type DragObjectType = DragObjectWithType & { id: string };
 
 export const SectionContainer: React.FC<Props> = props => {
   const [isHoverSectionTitle, setIsHoverSectionTitle] = useState(false);
@@ -24,16 +29,45 @@ export const SectionContainer: React.FC<Props> = props => {
   const section = useSelector((state: RootState) =>
     state.task.sections.find(v => v.id === props.sectionId)
   );
-  const dispatcher = useDispatch();
+  const dispatch = useDispatch();
+
+  const handleRef = useRef<HTMLDivElement>(null);
+  const dropRef = useRef<HTMLDivElement>(null);
+  const [{ isDragging }, connectDrag, previewRef] = useDrag({
+    item: { id: props.sectionId, type: DRAG_TYPE_SECTION },
+    collect: monitor => ({
+      isDragging: monitor.isDragging()
+    })
+  });
+  const [, connectDrop] = useDrop({
+    accept: DRAG_TYPE_SECTION,
+    hover: (v: DragObjectType) => {
+      if (v.id === props.sectionId) {
+        return;
+      }
+      dispatch(
+        actionCreator.task.moveDragSection({
+          draggedSectionId: v.id,
+          droppedSectionId: props.sectionId
+        })
+      );
+    }
+  });
+  connectDrag(handleRef);
+  connectDrop(dropRef);
+
   return (
     <div
+      ref={previewRef}
       css={css`
-        ${props.customCss}
+        opacity: ${isDragging ? 0.4 : 1};
+        ${props.customCss};
       `}
       onMouseEnter={() => setIsHoverSectionTitle(true)}
       onMouseLeave={() => setIsHoverSectionTitle(false)}
     >
       <div
+        ref={dropRef}
         css={css`
           position: relative;
           z-index: 1;
@@ -44,6 +78,7 @@ export const SectionContainer: React.FC<Props> = props => {
         `}
       >
         <div
+          ref={handleRef}
           css={css`
             display: inline-block;
             line-height: 0;
@@ -53,8 +88,10 @@ export const SectionContainer: React.FC<Props> = props => {
         >
           <Menu
             delete={() =>
-              dispatcher(
-                actionCreator.task.deleteSection({ sectionId: props.sectionId })
+              dispatch(
+                actionCreator.task.deleteSection({
+                  sectionId: props.sectionId
+                })
               )
             }
           />
@@ -62,7 +99,7 @@ export const SectionContainer: React.FC<Props> = props => {
         <Textarea
           value={section?.title || ''}
           changeValue={value =>
-            dispatcher(
+            dispatch(
               actionCreator.task.updateSectionTitle({
                 id: props.sectionId,
                 title: value

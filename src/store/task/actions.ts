@@ -45,6 +45,10 @@ export interface DeleteSectionAction extends Action {
   type: 'DELETE_SECTION';
   payload: { sectionId: string };
 }
+export interface MoveDragSectionAction extends Action {
+  type: 'MOVE_DRAG_SECTION';
+  payload: { draggedSectionId: string; droppedSectionId: string };
+}
 export type Actions =
   | AddTaskAction
   | AddTaskToSectionAction
@@ -56,7 +60,8 @@ export type Actions =
   | UpdateFocusTaskUuidAction
   | AddSectionAction
   | UpdateSectionTitleAction
-  | DeleteSectionAction;
+  | DeleteSectionAction
+  | MoveDragSectionAction;
 
 /** Action Creators */
 export const addTask = (): AddTaskAction => ({
@@ -113,6 +118,9 @@ export const updateSectionTitle = (
 export const deleteSection = (
   payload: DeleteSectionAction['payload']
 ): DeleteSectionAction => ({ type: 'DELETE_SECTION', payload });
+export const moveDragSection = (
+  payload: MoveDragSectionAction['payload']
+): MoveDragSectionAction => ({ type: 'MOVE_DRAG_SECTION', payload });
 export const actionCreator = {
   addTask,
   addTaskToSection,
@@ -124,5 +132,6 @@ export const actionCreator = {
   updateFocusTaskUuid,
   addSection,
   updateSectionTitle,
-  deleteSection
+  deleteSection,
+  moveDragSection
 };

@@ -143,6 +143,35 @@ export const reducer = (state: State = initState, action: Actions) => {
           draft.tasks.splice(taskIndex, 1);
         });
       });
+    case 'MOVE_DRAG_SECTION':
+      return produce(state, draft => {
+        const droppedSectionIndex = draft.sections.findIndex(
+          v => v.id === action.payload.droppedSectionId
+        );
+        if (droppedSectionIndex === -1) {
+          return;
+        }
+        const moveSectionIndex = draft.sections.findIndex(
+          v => v.id === action.payload.draggedSectionId
+        );
+        if (moveSectionIndex === -1) {
+          return;
+        }
+
+        // 移動先のindex。移動もとのsectionはまだ削除していないので、移動下より後方にある場合は、1プラスする。
+        const distIndex =
+          droppedSectionIndex > moveSectionIndex
+            ? droppedSectionIndex + 1
+            : droppedSectionIndex;
+        draft.sections.splice(distIndex, 0, draft.sections[moveSectionIndex]);
+        const draggedSectionIndex = draft.sections.findIndex(
+          (v, i) => v.id === action.payload.draggedSectionId && i !== distIndex
+        );
+        if (draggedSectionIndex === -1) {
+          return;
+        }
+        draft.sections.splice(draggedSectionIndex, 1);
+      });
     default:
       return state;
   }

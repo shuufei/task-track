@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 /** @jsx jsx */
 import { jsx, css } from '@emotion/core';
+import { DndProvider } from 'react-dnd';
+import Backend from 'react-dnd-html5-backend';
 
 import { RootState, actionCreator } from 'store';
 import { SectionContainer } from 'components/container/SectionContainer';
@@ -36,16 +38,18 @@ export const TasksPage: React.FC = () => {
         padding: 12px 24px 24px;
       `}
     >
-      {sectionIds.map(v => (
-        <SectionIdContext.Provider value={v} key={v}>
-          <SectionContainer
-            sectionId={v}
-            customCss={css`
-              margin-top: 24px;
-            `}
-          />
-        </SectionIdContext.Provider>
-      ))}
+      <DndProvider backend={Backend}>
+        {sectionIds.map(v => (
+          <SectionIdContext.Provider value={v} key={v}>
+            <SectionContainer
+              sectionId={v}
+              customCss={css`
+                margin-top: 24px;
+              `}
+            />
+          </SectionIdContext.Provider>
+        ))}
+      </DndProvider>
       <button
         css={css`
           margin-top: 32px;
