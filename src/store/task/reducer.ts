@@ -2,7 +2,7 @@ import produce from 'immer';
 
 import { Actions } from './actions';
 import { State, initState } from '.';
-import { generateTask } from 'model/task';
+import { generateTask, findTask } from 'model/task';
 import { generateSection } from 'model/section';
 
 export const reducer = (state: State = initState, action: Actions) => {
@@ -47,11 +47,19 @@ export const reducer = (state: State = initState, action: Actions) => {
       });
     case 'UPDATE_TASK':
       return produce(state, draft => {
-        const index = draft.tasks.findIndex(
-          v => v.uuid === action.payload.task.uuid
+        // const index = draft.tasks.findIndex(
+        //   v => v.uuid === action.payload.task.uuid
+        // );
+        // if (index !== -1) {
+        //   draft.tasks[index] = action.payload.task;
+        // }
+        const updateTask = findTask(
+          action.payload.task.uuid,
+          draft.tasks,
+          action.payload.parentTaskUuids
         );
-        if (index !== -1) {
-          draft.tasks[index] = action.payload.task;
+        if (updateTask != null) {
+          Object.assign(updateTask, action.payload.task);
         }
       });
     case 'DELETE_TASK':
@@ -171,6 +179,27 @@ export const reducer = (state: State = initState, action: Actions) => {
           return;
         }
         draft.sections.splice(draggedSectionIndex, 1);
+      });
+    case 'MOVE_TO_SUB_TASK':
+      return produce(state, draft => {
+        const parent = draft.tasks.find(
+          v => v.uuid === action.payload.parentTaskUuid
+        );
+        if (parent == null) {
+          return;
+        }
+        const movedTask = { ...action.payload.task };
+        movedTask.sectionId = parent.sectionId;
+        parent.subTasks != null
+          ? parent.subTasks.push(movedTask)
+          : (parent.subTasks = [movedTask]);
+        const movedTaskIndex = draft.tasks.findIndex(
+          v => v.uuid === movedTask.uuid
+        );
+        if (movedTaskIndex === -1) {
+          return;
+        }
+        draft.tasks.splice(movedTaskIndex, 1);
       });
     default:
       return state;

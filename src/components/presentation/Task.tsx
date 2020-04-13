@@ -81,6 +81,7 @@ export type Props = {
   done: (isDone: boolean) => void;
   addTask: () => void;
   onHover: (draggedTaskUuid: string) => void;
+  moveToSubtask: () => void;
   customCss?: SerializedStyles;
   focus?: boolean;
 };
@@ -149,9 +150,9 @@ export const Task: React.FC<Props> = props => {
         border-radius: 3px;
         border: solid 1px
           ${props.isPlaying ? colors.primary500 : 'rgba(0,0,0,0)'};
-        ${shadow}
-        ${props.customCss}
+        ${shadow};
         opacity: ${isDragging ? 0.4 : 1};
+        ${props.customCss};
       `}
     >
       <div
@@ -190,7 +191,7 @@ export const Task: React.FC<Props> = props => {
           ref={innerRef}
           editTitle={props.editTitle}
           onPressEnter={props.addTask}
-          onPressTab={() => {}}
+          onPressTab={props.moveToSubtask}
           onPressDelete={props.delete}
           customCss={css`
             margin-left: 6px;

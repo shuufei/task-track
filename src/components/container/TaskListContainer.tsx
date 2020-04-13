@@ -24,6 +24,8 @@ export const TaskListContainer: React.FC<Props> = props => {
         {props.uuids.map((uuid, i) => (
           <TaskContainer
             uuid={uuid}
+            prevTaskUuid={i !== 0 ? props.uuids[i - 1] : undefined}
+            parentTaskUuids={[]}
             key={uuid}
             customCss={
               i > 0

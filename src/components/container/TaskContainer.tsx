@@ -1,20 +1,23 @@
 import React, { useEffect, useCallback, useContext } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { SerializedStyles } from '@emotion/core';
+/** @jsx jsx */
+import { jsx, css, SerializedStyles } from '@emotion/core';
 
 import { Task } from 'components/presentation/Task';
 import { RootState, actionCreator } from 'store';
-import { Task as TaskType } from 'model/task';
+import { Task as TaskType, findTask } from 'model/task';
 import { SectionIdContext } from 'pages/TasksPage';
 
 export type Props = {
   uuid: string;
+  prevTaskUuid?: string;
+  parentTaskUuids: string[];
   customCss?: SerializedStyles;
 };
 
 export const TaskContainer: React.FC<Props> = props => {
   const task = useSelector((state: RootState) =>
-    state.task.tasks.find(v => v.uuid === props.uuid)
+    findTask(props.uuid, state.task.tasks, props.parentTaskUuids)
   );
   const focusUuid = useSelector((state: RootState) => state.task.focusUuid);
   const dispatch = useDispatch();
@@ -23,9 +26,14 @@ export const TaskContainer: React.FC<Props> = props => {
   const updateTask = useCallback(
     (task: TaskType) => {
       task.updatedAt = new Date();
-      dispatch(actionCreator.task.updateTask({ task }));
+      dispatch(
+        actionCreator.task.updateTask({
+          task,
+          parentTaskUuids: props.parentTaskUuids
+        })
+      );
     },
-    [dispatch]
+    [dispatch, props.parentTaskUuids]
   );
   const updateTimesec = (sec: number) => {
     if (task == null) {
@@ -123,28 +131,55 @@ export const TaskContainer: React.FC<Props> = props => {
     },
     [dispatch, props.uuid]
   );
+  const moveToSubTask = () => {
+    if (props.prevTaskUuid == null || task == null) {
+      return;
+    }
+    console.log('--- dispatch movetosubtask: ', props.prevTaskUuid, task);
+    dispatch(
+      actionCreator.task.moveToSubTask({
+        parentTaskUuid: props.prevTaskUuid,
+        task
+      })
+    );
+  };
 
   return (
-    <Task
-      uuid={task?.uuid || ''}
-      title={task?.title || ''}
-      timesec={task?.timesec || 0}
-      isDone={task?.isDone || false}
-      isPlaying={task?.isPlaying || false}
-      comments={task?.comments || []}
-      addSec={(sec, current) => updateTimesec(current + sec)}
-      subtractSec={(sec, current) => updateTimesec(current - sec)}
-      done={isDone => updateIsDone(isDone)}
-      play={() => updateIsPlaying(true)}
-      pause={() => updateIsPlaying(false)}
-      editTitle={value => updateTitle(value)}
-      addComment={() => {}}
-      editComments={comments => updateComments(comments)}
-      delete={() => deleteTask()}
-      onHover={moveTask}
-      addTask={addTask}
-      customCss={props.customCss}
-      focus={focusUuid === props.uuid}
-    />
+    <div css={props.customCss}>
+      <Task
+        uuid={task?.uuid || ''}
+        title={task?.title || ''}
+        timesec={task?.timesec || 0}
+        isDone={task?.isDone || false}
+        isPlaying={task?.isPlaying || false}
+        comments={task?.comments || []}
+        addSec={(sec, current) => updateTimesec(current + sec)}
+        subtractSec={(sec, current) => updateTimesec(current - sec)}
+        done={isDone => updateIsDone(isDone)}
+        play={() => updateIsPlaying(true)}
+        pause={() => updateIsPlaying(false)}
+        editTitle={value => updateTitle(value)}
+        addComment={() => {}}
+        editComments={comments => updateComments(comments)}
+        delete={() => deleteTask()}
+        onHover={moveTask}
+        addTask={addTask}
+        moveToSubtask={moveToSubTask}
+        focus={focusUuid === props.uuid}
+      />
+      {task?.subTasks &&
+        task.subTasks.map((subTask, i) => (
+          <TaskContainer
+            uuid={subTask.uuid}
+            prevTaskUuid={i !== 0 ? task.subTasks![i - 1].uuid : undefined}
+            parentTaskUuids={[...props.parentTaskUuids, task.uuid]}
+            key={subTask.uuid}
+            customCss={css`
+              margin-top: 6px;
+              margin-left: 24px;
+            `}
+          />
+        ))}
+    </div>
   );
 };
