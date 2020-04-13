@@ -39,12 +39,12 @@ export const TasksPage: React.FC = () => {
       `}
     >
       <DndProvider backend={Backend}>
-        {sectionIds.map(v => (
+        {sectionIds.map((v, i) => (
           <SectionIdContext.Provider value={v} key={v}>
             <SectionContainer
               sectionId={v}
               customCss={css`
-                margin-top: 24px;
+                margin-top: ${i === 0 ? '12px' : '24px'};
               `}
             />
           </SectionIdContext.Provider>
