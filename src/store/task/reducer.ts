@@ -2,64 +2,142 @@ import produce from 'immer';
 
 import { Actions } from './actions';
 import { State, initState } from '.';
-import { generateTask, findTask } from 'model/task';
+import { generateTask, Task } from 'model/task';
 import { generateSection } from 'model/section';
+
+export const removeSubTaskFromParent = (
+  tasks: Task[],
+  parentTaskUuid: string,
+  childTaskUuid: string
+) => {
+  const parentTask = tasks.find(v => v.uuid === parentTaskUuid);
+  if (parentTask == null || parentTask.subTaskUuids == null) {
+    return;
+  }
+  const subTaskIndex = parentTask.subTaskUuids.findIndex(
+    v => v === childTaskUuid
+  );
+  if (subTaskIndex !== -1) {
+    parentTask.subTaskUuids.splice(subTaskIndex, 1);
+  }
+};
+
+export const addSubTaskToParent = (
+  tasks: Task[],
+  parentTaskUuid: string,
+  childTaskUuid: string,
+  prevTaskUuid?: string
+) => {
+  const parentTask = tasks.find(v => v.uuid === parentTaskUuid);
+  if (parentTask == null || parentTask.subTaskUuids == null) {
+    return;
+  }
+  const prevTaskIndex = parentTask.subTaskUuids.findIndex(
+    v => v === prevTaskUuid
+  );
+  if (prevTaskIndex === -1) {
+    parentTask.subTaskUuids.push(childTaskUuid);
+  } else {
+    parentTask.subTaskUuids.splice(prevTaskIndex + 1, 0, childTaskUuid);
+  }
+};
 
 export const reducer = (state: State = initState, action: Actions) => {
   switch (action.type) {
     case 'ADD_TASK':
       return produce(state, draft => {
         const task = generateTask();
+
+        // 親タスクに関連を追加
+        if (action.payload.parentTaskUuid != null) {
+          task.parentTaskUuid = action.payload.parentTaskUuid;
+          addSubTaskToParent(
+            draft.tasks,
+            action.payload.parentTaskUuid,
+            task.uuid
+          );
+        }
+
         draft.tasks.push(task);
         draft.focusUuid = task.uuid;
       });
     case 'ADD_TASK_TO_SECTION':
       return produce(state, draft => {
         const task = generateTask();
+
+        // 親タスクに関連を追加
+        if (action.payload.parentTaskUuid != null) {
+          task.parentTaskUuid = action.payload.parentTaskUuid;
+          addSubTaskToParent(
+            draft.tasks,
+            action.payload.parentTaskUuid,
+            task.uuid
+          );
+        }
+
         draft.tasks.push({ ...task, sectionId: action.payload.sectionId });
         draft.focusUuid = task.uuid;
       });
     case 'ADD_TASK_BY_UUID':
       return produce(state, draft => {
         const task = generateTask();
-        const index = draft.tasks.findIndex(
-          v => v.uuid === action.payload.uuid
-        );
-        if (index === -1) {
+
+        if (action.payload.parentTaskUuid != null) {
+          // 親タスクに関連を追加
+          task.parentTaskUuid = action.payload.parentTaskUuid;
+          addSubTaskToParent(
+            draft.tasks,
+            action.payload.parentTaskUuid,
+            task.uuid,
+            action.payload.uuid
+          );
           draft.tasks.push(task);
         } else {
-          draft.tasks.splice(index + 1, 0, task);
+          const index = draft.tasks.findIndex(
+            v => v.uuid === action.payload.uuid
+          );
+          if (index === -1) {
+            draft.tasks.push(task);
+          } else {
+            draft.tasks.splice(index + 1, 0, task);
+          }
         }
+
         draft.focusUuid = task.uuid;
       });
     case 'ADD_TASK_BY_UUID_TO_SECTION':
       return produce(state, draft => {
         const task = { ...generateTask(), sectionId: action.payload.sectionId };
-        const index = draft.tasks.findIndex(
-          v => v.uuid === action.payload.uuid
-        );
-        if (index === -1) {
+
+        if (action.payload.parentTaskUuid != null) {
+          // 親タスクに関連を追加
+          task.parentTaskUuid = action.payload.parentTaskUuid;
+          addSubTaskToParent(
+            draft.tasks,
+            action.payload.parentTaskUuid,
+            task.uuid,
+            action.payload.uuid
+          );
           draft.tasks.push(task);
         } else {
-          draft.tasks.splice(index + 1, 0, task);
+          const index = draft.tasks.findIndex(
+            v => v.uuid === action.payload.uuid
+          );
+          if (index === -1) {
+            draft.tasks.push(task);
+          } else {
+            draft.tasks.splice(index + 1, 0, task);
+          }
         }
         draft.focusUuid = task.uuid;
       });
     case 'UPDATE_TASK':
       return produce(state, draft => {
-        // const index = draft.tasks.findIndex(
-        //   v => v.uuid === action.payload.task.uuid
-        // );
-        // if (index !== -1) {
-        //   draft.tasks[index] = action.payload.task;
-        // }
-        const updateTask = findTask(
-          action.payload.task.uuid,
-          draft.tasks,
-          action.payload.parentTaskUuids
+        const index = draft.tasks.findIndex(
+          v => v.uuid === action.payload.task.uuid
         );
-        if (updateTask != null) {
-          Object.assign(updateTask, action.payload.task);
+        if (index !== -1) {
+          draft.tasks[index] = action.payload.task;
         }
       });
     case 'DELETE_TASK':
@@ -73,6 +151,17 @@ export const reducer = (state: State = initState, action: Actions) => {
         const indexOfSection = sectionTasks.findIndex(
           v => v.uuid === action.payload.uuid
         );
+
+        // 親タスクから関連を削除
+        const deleteTask = draft.tasks[index];
+        if (deleteTask.parentTaskUuid != null) {
+          removeSubTaskFromParent(
+            draft.tasks,
+            deleteTask.parentTaskUuid,
+            deleteTask.uuid
+          );
+        }
+
         if (index !== -1) {
           draft.tasks.splice(index, 1);
         }
@@ -188,18 +277,34 @@ export const reducer = (state: State = initState, action: Actions) => {
         if (parent == null) {
           return;
         }
+
+        // Sectionを合わせる
         const movedTask = { ...action.payload.task };
         movedTask.sectionId = parent.sectionId;
-        parent.subTasks != null
-          ? parent.subTasks.push(movedTask)
-          : (parent.subTasks = [movedTask]);
+
+        // 親のタスクのsubTaskに追加
+        if (parent.subTaskUuids == null) {
+          parent.subTaskUuids = [];
+        }
+        parent.subTaskUuids.push(movedTask.uuid);
         const movedTaskIndex = draft.tasks.findIndex(
           v => v.uuid === movedTask.uuid
         );
         if (movedTaskIndex === -1) {
           return;
         }
-        draft.tasks.splice(movedTaskIndex, 1);
+
+        // 移動前の親タスクから関連を削除
+        if (movedTask.parentTaskUuid != null) {
+          removeSubTaskFromParent(
+            draft.tasks,
+            movedTask.parentTaskUuid,
+            movedTask.uuid
+          );
+        }
+
+        // 親タスクのuuidを保持
+        draft.tasks[movedTaskIndex].parentTaskUuid = parent.uuid;
       });
     default:
       return state;

@@ -5,22 +5,23 @@ import { Section } from 'model/section';
 /** Action Definitions */
 export interface AddTaskAction extends Action {
   type: 'ADD_TASK';
+  payload: { parentTaskUuid?: string };
 }
 export interface AddTaskToSectionAction extends Action {
   type: 'ADD_TASK_TO_SECTION';
-  payload: { sectionId: string };
+  payload: { sectionId: string; parentTaskUuid?: string };
 }
 export interface AddTaskByUuidAction extends Action {
   type: 'ADD_TASK_BY_UUID';
-  payload: { uuid: string };
+  payload: { uuid: string; parentTaskUuid?: string };
 }
 export interface AddTaskByUuidToSectionAction extends Action {
   type: 'ADD_TASK_BY_UUID_TO_SECTION';
-  payload: { uuid: string; sectionId: string };
+  payload: { uuid: string; sectionId: string; parentTaskUuid?: string };
 }
 export interface UpdateTaskAction extends Action {
   type: 'UPDATE_TASK';
-  payload: { task: Task; parentTaskUuids: string[] };
+  payload: { task: Task };
 }
 export interface DeleteTaskAction extends Action {
   type: 'DELETE_TASK';
@@ -69,8 +70,9 @@ export type Actions =
   | MoveToSubTaskAction;
 
 /** Action Creators */
-export const addTask = (): AddTaskAction => ({
-  type: 'ADD_TASK'
+export const addTask = (payload: AddTaskAction['payload']): AddTaskAction => ({
+  type: 'ADD_TASK',
+  payload
 });
 export const addTaskToSection = (
   payload: AddTaskToSectionAction['payload']

@@ -5,19 +5,18 @@ import { jsx, css, SerializedStyles } from '@emotion/core';
 
 import { Task } from 'components/presentation/Task';
 import { RootState, actionCreator } from 'store';
-import { Task as TaskType, findTask } from 'model/task';
+import { Task as TaskType } from 'model/task';
 import { SectionIdContext } from 'pages/TasksPage';
 
 export type Props = {
   uuid: string;
   prevTaskUuid?: string;
-  parentTaskUuids: string[];
   customCss?: SerializedStyles;
 };
 
 export const TaskContainer: React.FC<Props> = props => {
   const task = useSelector((state: RootState) =>
-    findTask(props.uuid, state.task.tasks, props.parentTaskUuids)
+    state.task.tasks.find(v => v.uuid === props.uuid)
   );
   const focusUuid = useSelector((state: RootState) => state.task.focusUuid);
   const dispatch = useDispatch();
@@ -28,12 +27,11 @@ export const TaskContainer: React.FC<Props> = props => {
       task.updatedAt = new Date();
       dispatch(
         actionCreator.task.updateTask({
-          task,
-          parentTaskUuids: props.parentTaskUuids
+          task
         })
       );
     },
-    [dispatch, props.parentTaskUuids]
+    [dispatch]
   );
   const updateTimesec = (sec: number) => {
     if (task == null) {
@@ -91,10 +89,16 @@ export const TaskContainer: React.FC<Props> = props => {
       ? dispatch(
           actionCreator.task.addTaskByUuidToSection({
             uuid: props.uuid,
-            sectionId
+            sectionId,
+            parentTaskUuid: task?.parentTaskUuid
           })
         )
-      : dispatch(actionCreator.task.addTaskByUuid({ uuid: props.uuid }));
+      : dispatch(
+          actionCreator.task.addTaskByUuid({
+            uuid: props.uuid,
+            parentTaskUuid: task?.parentTaskUuid
+          })
+        );
   };
   useEffect(() => {
     const interval = setInterval(() => {
@@ -135,7 +139,6 @@ export const TaskContainer: React.FC<Props> = props => {
     if (props.prevTaskUuid == null || task == null) {
       return;
     }
-    console.log('--- dispatch movetosubtask: ', props.prevTaskUuid, task);
     dispatch(
       actionCreator.task.moveToSubTask({
         parentTaskUuid: props.prevTaskUuid,
@@ -167,13 +170,12 @@ export const TaskContainer: React.FC<Props> = props => {
         moveToSubtask={moveToSubTask}
         focus={focusUuid === props.uuid}
       />
-      {task?.subTasks &&
-        task.subTasks.map((subTask, i) => (
+      {task?.subTaskUuids &&
+        task.subTaskUuids.map((uuid, i) => (
           <TaskContainer
-            uuid={subTask.uuid}
-            prevTaskUuid={i !== 0 ? task.subTasks![i - 1].uuid : undefined}
-            parentTaskUuids={[...props.parentTaskUuids, task.uuid]}
-            key={subTask.uuid}
+            uuid={uuid}
+            prevTaskUuid={i !== 0 ? task.subTaskUuids![i - 1] : undefined}
+            key={uuid}
             customCss={css`
               margin-top: 6px;
               margin-left: 24px;

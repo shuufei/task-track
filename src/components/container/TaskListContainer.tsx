@@ -25,7 +25,6 @@ export const TaskListContainer: React.FC<Props> = props => {
           <TaskContainer
             uuid={uuid}
             prevTaskUuid={i !== 0 ? props.uuids[i - 1] : undefined}
-            parentTaskUuids={[]}
             key={uuid}
             customCss={
               i > 0
@@ -41,7 +40,7 @@ export const TaskListContainer: React.FC<Props> = props => {
         onClick={() =>
           sectionId != null
             ? dispatch(actionCreator.task.addTaskToSection({ sectionId }))
-            : dispatch(actionCreator.task.addTask())
+            : dispatch(actionCreator.task.addTask({}))
         }
         css={css`
           margin-top: 6px;

@@ -17,7 +17,9 @@ export type Props = {
 export const SectionReportContainer: React.FC<Props> = props => {
   const [isSortByTime, setIsSortByTime] = useState(false);
   const taskUuids = useSelector((state: RootState) => {
-    const tasks = state.task.tasks.filter(v => v.sectionId === props.sectionId);
+    const tasks = state.task.tasks
+      .filter(v => v.sectionId === props.sectionId)
+      .filter(v => v.timesec > 0);
     if (isSortByTime) {
       tasks.sort((v1, v2) => v2.timesec - v1.timesec);
     }

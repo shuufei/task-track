@@ -23,6 +23,7 @@ export const SectionContainer: React.FC<Props> = props => {
   const [isHoverSectionTitle, setIsHoverSectionTitle] = useState(false);
   const sectionTaskUuids = useSelector((state: RootState) =>
     state.task.tasks
+      .filter(v => v.parentTaskUuid == null)
       .filter(v => v.sectionId === props.sectionId)
       .map(v => v.uuid)
   );
