@@ -1,13 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 /** @jsx jsx */
 import { jsx, css, SerializedStyles } from '@emotion/core';
-import {
-  useDrag,
-  useDrop,
-  DragObjectWithType,
-  DragElementWrapper,
-  DragPreviewOptions
-} from 'react-dnd';
 
 import { colors } from 'styles/color';
 import { shadow } from 'styles/shadow';
@@ -18,50 +11,9 @@ import { Icon } from './Icon';
 import { AdjustHeightToTextarea, Handler } from './Textarea';
 import { Comment } from './Comment';
 import { TaskTextarea } from './TaskTextare';
+import { useTaskDrag } from 'hooks/task-drag-and-drop';
 
 export const DRAG_TYPE_TASK = 'TASK';
-
-type DragObjectType = DragObjectWithType & { uuid: string };
-
-const useTaskDragDrop = (
-  taskUuid: string,
-  onHover: (draggedTaskUuid: string) => void,
-  setIsDragging: (isDragging: boolean) => void
-): [
-  React.RefObject<HTMLDivElement>,
-  React.RefObject<HTMLDivElement>,
-  DragElementWrapper<DragPreviewOptions>
-] => {
-  const handleRef = useRef<HTMLDivElement>(null);
-  const dropRef = useRef<HTMLDivElement>(null);
-  const [, connectDrag, previewRef] = useDrag({
-    item: { uuid: taskUuid, type: DRAG_TYPE_TASK },
-    begin: () => {
-      setIsDragging(true);
-    },
-    end: () => {
-      setIsDragging(false);
-    }
-  });
-  const [, connectDrop] = useDrop({
-    accept: DRAG_TYPE_TASK,
-    hover: (v: DragObjectType, monitor) => {
-      if (!dropRef.current) {
-        return;
-      }
-      onHover(v.uuid);
-    },
-    drop: () => {
-      setIsDragging(false);
-    },
-    collect: monitor => ({
-      isOver: !!monitor.isOver()
-    })
-  });
-  connectDrag(handleRef);
-  connectDrop(dropRef);
-  return [handleRef, dropRef, previewRef];
-};
 
 export type Props = {
   uuid: string;
@@ -80,7 +32,6 @@ export type Props = {
   editComments: (comments: string[]) => void;
   done: (isDone: boolean) => void;
   addTask: () => void;
-  onHover: (draggedTaskUuid: string) => void;
   moveToSubtask: () => void;
   customCss?: SerializedStyles;
   focus?: boolean;
@@ -130,21 +81,13 @@ export const Task: React.FC<Props> = props => {
     );
   };
 
-  const [handleRef, dropRef, previewRef] = useTaskDragDrop(
-    props.uuid,
-    draggedTaskUuid => {
-      if (draggedTaskUuid === props.uuid) {
-        setIsDragging(true);
-      }
-      props.onHover(draggedTaskUuid);
-    },
-    setIsDragging
-  );
+  const [handleRef, previewRef] = useTaskDrag(props.uuid, setIsDragging);
 
   return (
     <div
       ref={previewRef}
       css={css`
+        position: relative;
         background-color: ${colors.white};
         padding: 6px 16px 6px 10px;
         border-radius: 3px;
@@ -156,8 +99,8 @@ export const Task: React.FC<Props> = props => {
       `}
     >
       <div
-        ref={dropRef}
         css={css`
+          position: relative;
           display: flex;
           align-items: flex-start;
         `}

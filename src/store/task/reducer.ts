@@ -22,20 +22,38 @@ export const removeSubTaskFromParent = (
   }
 };
 
+export const getParentTaskAndChildIndex = (
+  tasks: Task[],
+  parentTaskUuid: string,
+  childTaskUuid?: string
+): [Task | undefined, number | undefined] => {
+  const parentTask = tasks.find(v => v.uuid === parentTaskUuid);
+  if (parentTask == null || parentTask.subTaskUuids == null) {
+    return [undefined, undefined];
+  }
+  const childTaskIndex = parentTask.subTaskUuids.findIndex(
+    v => v === childTaskUuid
+  );
+  return childTaskIndex !== -1
+    ? [parentTask, childTaskIndex]
+    : [parentTask, undefined];
+};
+
 export const addSubTaskToParent = (
   tasks: Task[],
   parentTaskUuid: string,
   childTaskUuid: string,
   prevTaskUuid?: string
 ) => {
-  const parentTask = tasks.find(v => v.uuid === parentTaskUuid);
+  const [parentTask, prevTaskIndex] = getParentTaskAndChildIndex(
+    tasks,
+    parentTaskUuid,
+    prevTaskUuid
+  );
   if (parentTask == null || parentTask.subTaskUuids == null) {
     return;
   }
-  const prevTaskIndex = parentTask.subTaskUuids.findIndex(
-    v => v === prevTaskUuid
-  );
-  if (prevTaskIndex === -1) {
+  if (prevTaskIndex == null) {
     parentTask.subTaskUuids.push(childTaskUuid);
   } else {
     parentTask.subTaskUuids.splice(prevTaskIndex + 1, 0, childTaskUuid);
@@ -173,36 +191,144 @@ export const reducer = (state: State = initState, action: Actions) => {
       });
     case 'MOVE_TASK':
       return produce(state, draft => {
-        const droppedTaskIndex = draft.tasks.findIndex(
+        const droppedTask = draft.tasks.find(
           v => v.uuid === action.payload.droppedTaskUuid
         );
-        if (droppedTaskIndex === -1) {
-          return;
-        }
-        const moveTaskIndex = draft.tasks.findIndex(
+        const moveTask = draft.tasks.find(
           v => v.uuid === action.payload.draggedTaskUuid
         );
-        if (moveTaskIndex === -1) {
+
+        if (droppedTask == null || moveTask == null) {
           return;
         }
 
         // ドロップ先のsectionに変更する
-        draft.tasks[moveTaskIndex].sectionId =
-          draft.tasks[droppedTaskIndex].sectionId;
+        moveTask.sectionId = droppedTask.sectionId;
 
-        // 移動先のindex。移動もとのtaskはまだ削除していないので、移動もとより後方にある場合は、1プラスする
-        const distIndex =
-          droppedTaskIndex > moveTaskIndex
-            ? droppedTaskIndex + 1
-            : droppedTaskIndex;
-        draft.tasks.splice(distIndex, 0, draft.tasks[moveTaskIndex]);
-        const draggedTaskIndex = draft.tasks.findIndex(
-          (v, i) => v.uuid === action.payload.draggedTaskUuid && i !== distIndex
-        );
-        if (draggedTaskIndex === -1) {
-          return;
+        if (
+          // 両方サブタスクの場合
+          droppedTask.parentTaskUuid != null &&
+          moveTask.parentTaskUuid != null
+        ) {
+          const [parent, droppedSubTaskIndex] = getParentTaskAndChildIndex(
+            draft.tasks,
+            droppedTask.parentTaskUuid,
+            droppedTask.uuid
+          );
+          if (
+            parent == null ||
+            droppedSubTaskIndex == null ||
+            parent.subTaskUuids == null
+          ) {
+            return;
+          }
+          const distIndex =
+            action.payload.direction === 'next'
+              ? droppedSubTaskIndex + 1
+              : droppedSubTaskIndex;
+          parent.subTaskUuids.splice(distIndex, 0, moveTask.uuid);
+          if (droppedTask.parentTaskUuid === moveTask.parentTaskUuid) {
+            // 親が同じ場合は、親の中で移動させる
+            const moveTaskDroppedIndex = parent.subTaskUuids.findIndex(
+              (v, i) => v === moveTask.uuid && i !== distIndex
+            );
+            parent.subTaskUuids.splice(moveTaskDroppedIndex, 1);
+          } else {
+            // 親が異なる場合は、単純に追加、削除して、親を変更
+            removeSubTaskFromParent(
+              draft.tasks,
+              moveTask.parentTaskUuid,
+              moveTask.uuid
+            );
+            moveTask.parentTaskUuid = parent.uuid;
+          }
+        } else if (
+          // 両方サブタスクでない場合
+          droppedTask.parentTaskUuid == null &&
+          moveTask.parentTaskUuid == null
+        ) {
+          const droppedTaskIndex = draft.tasks.findIndex(
+            v => v.uuid === action.payload.droppedTaskUuid
+          );
+          if (droppedTaskIndex === -1) {
+            return;
+          }
+          const moveTaskIndex = draft.tasks.findIndex(
+            v => v.uuid === action.payload.draggedTaskUuid
+          );
+          if (moveTaskIndex === -1) {
+            return;
+          }
+          const distIndex =
+            action.payload.direction === 'next'
+              ? droppedTaskIndex + 1
+              : droppedTaskIndex;
+          draft.tasks.splice(distIndex, 0, draft.tasks[moveTaskIndex]);
+          const draggedTaskIndex = draft.tasks.findIndex(
+            (v, i) =>
+              v.uuid === action.payload.draggedTaskUuid && i !== distIndex
+          );
+          if (draggedTaskIndex === -1) {
+            return;
+          }
+          draft.tasks.splice(draggedTaskIndex, 1);
+        } else if (
+          // ドロップ先のタスクがサブタスクの場合
+          droppedTask.parentTaskUuid != null &&
+          moveTask.parentTaskUuid == null
+        ) {
+          if (moveTask.uuid === droppedTask.parentTaskUuid) {
+            return;
+          }
+          const [parent, droppedSubTaskIndex] = getParentTaskAndChildIndex(
+            draft.tasks,
+            droppedTask.parentTaskUuid,
+            droppedTask.uuid
+          );
+          if (
+            parent == null ||
+            droppedSubTaskIndex == null ||
+            parent.subTaskUuids == null
+          ) {
+            return;
+          }
+          const distIndex =
+            action.payload.direction === 'next'
+              ? droppedSubTaskIndex + 1
+              : droppedSubTaskIndex;
+          parent.subTaskUuids.splice(distIndex, 0, moveTask.uuid);
+          moveTask.parentTaskUuid = parent.uuid;
+        } else if (
+          // ドラッグ対象のタスクがサブタスクの場合
+          droppedTask.parentTaskUuid == null &&
+          moveTask.parentTaskUuid != null
+        ) {
+          removeSubTaskFromParent(
+            draft.tasks,
+            moveTask.parentTaskUuid,
+            moveTask.uuid
+          );
+          const droppedTaskIndex = draft.tasks.findIndex(
+            v => v.uuid === droppedTask.uuid
+          );
+          if (droppedTaskIndex === -1) {
+            return;
+          }
+          const distIndex =
+            action.payload.direction === 'next'
+              ? droppedTaskIndex + 1
+              : droppedTaskIndex;
+          draft.tasks.splice(distIndex, 0, moveTask);
+          const draggedTaskIndex = draft.tasks.findIndex(
+            (v, i) =>
+              v.uuid === action.payload.draggedTaskUuid && i !== distIndex
+          );
+          if (draggedTaskIndex === -1) {
+            return;
+          }
+          draft.tasks.splice(draggedTaskIndex, 1);
+          moveTask.parentTaskUuid = undefined;
         }
-        draft.tasks.splice(draggedTaskIndex, 1);
       });
     case 'UPDATE_FOCUS_TASK_UUID':
       return produce(state, draft => {

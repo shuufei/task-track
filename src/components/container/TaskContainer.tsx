@@ -7,6 +7,8 @@ import { Task } from 'components/presentation/Task';
 import { RootState, actionCreator } from 'store';
 import { Task as TaskType } from 'model/task';
 import { SectionIdContext } from 'pages/TasksPage';
+import { useTaskDrop } from 'hooks/task-drag-and-drop';
+import { colors } from 'styles/color';
 
 export type Props = {
   uuid: string;
@@ -21,6 +23,12 @@ export const TaskContainer: React.FC<Props> = props => {
   const focusUuid = useSelector((state: RootState) => state.task.focusUuid);
   const dispatch = useDispatch();
   const sectionId = useContext(SectionIdContext);
+
+  const isHaveSubtasks = !!(
+    task &&
+    task.subTaskUuids &&
+    task.subTaskUuids.length > 0
+  );
 
   const updateTask = useCallback(
     (task: TaskType) => {
@@ -122,14 +130,15 @@ export const TaskContainer: React.FC<Props> = props => {
     };
   }, [task, updateTask]);
   const moveTask = useCallback(
-    (draggedTaskUuid: string) => {
+    (draggedTaskUuid: string, isOverLowerBody: boolean) => {
       if (props.uuid === draggedTaskUuid) {
         return;
       }
       dispatch(
-        actionCreator.task.moveDragTask({
+        actionCreator.task.moveTask({
           draggedTaskUuid: draggedTaskUuid,
-          droppedTaskUuid: props.uuid
+          droppedTaskUuid: props.uuid,
+          direction: isOverLowerBody ? 'next' : 'prev'
         })
       );
     },
@@ -147,8 +156,22 @@ export const TaskContainer: React.FC<Props> = props => {
     );
   };
 
+  const [
+    dropRef,
+    draggedItem,
+    ,
+    isOverUpperBody,
+    isOverLowerBody
+  ] = useTaskDrop(moveTask);
+
   return (
-    <div css={props.customCss}>
+    <div
+      css={css`
+        position: relative;
+        ${props.customCss};
+      `}
+      ref={!isHaveSubtasks ? dropRef : undefined}
+    >
       <Task
         uuid={task?.uuid || ''}
         title={task?.title || ''}
@@ -165,11 +188,36 @@ export const TaskContainer: React.FC<Props> = props => {
         addComment={() => {}}
         editComments={comments => updateComments(comments)}
         delete={() => deleteTask()}
-        onHover={moveTask}
         addTask={addTask}
         moveToSubtask={moveToSubTask}
         focus={focusUuid === props.uuid}
       />
+      <div
+        css={css`
+          position: absolute;
+          top: -4px;
+          left: 0;
+          height: 1.5px;
+          width: 100%;
+          background-color: ${isOverUpperBody &&
+          draggedItem?.uuid !== props.uuid
+            ? colors.primary400
+            : colors.transparent};
+        `}
+      ></div>
+      <div
+        css={css`
+          position: absolute;
+          bottom: -4px;
+          left: 0;
+          height: 2.5px;
+          width: 100%;
+          background-color: ${isOverLowerBody &&
+          draggedItem?.uuid !== props.uuid
+            ? colors.primary400
+            : colors.transparent};
+        `}
+      ></div>
       {task?.subTaskUuids &&
         task.subTaskUuids.map((uuid, i) => (
           <TaskContainer
