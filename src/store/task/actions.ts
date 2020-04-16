@@ -2,6 +2,8 @@ import { Action } from 'redux';
 import { Task } from 'model/task';
 import { Section } from 'model/section';
 
+export type MoveDirection = 'prev' | 'next';
+
 /** Action Definitions */
 export interface AddTaskAction extends Action {
   type: 'ADD_TASK';
@@ -32,7 +34,7 @@ export interface MoveTaskAction extends Action {
   payload: {
     draggedTaskUuid: string;
     droppedTaskUuid: string;
-    direction: 'prev' | 'next';
+    direction: MoveDirection;
   };
 }
 export interface UpdateFocusTaskUuidAction extends Action {
