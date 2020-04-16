@@ -212,7 +212,8 @@ export const TaskContainer: React.FC<Props> = props => {
           height: 1.5px;
           width: 100%;
           background-color: ${isOverUpperBody &&
-          draggedItem?.uuid !== props.uuid
+          draggedItem?.uuid !== props.uuid &&
+          draggedItem?.uuid !== task?.parentTaskUuid
             ? colors.primary400
             : colors.transparent};
         `}
@@ -226,7 +227,8 @@ export const TaskContainer: React.FC<Props> = props => {
             height: 2.5px;
             width: 100%;
             background-color: ${isOverLowerBody &&
-            draggedItem?.uuid !== props.uuid
+            draggedItem?.uuid !== props.uuid &&
+            draggedItem?.uuid !== task?.parentTaskUuid
               ? colors.primary400
               : colors.transparent};
           `}
