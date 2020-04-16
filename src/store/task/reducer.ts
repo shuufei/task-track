@@ -346,58 +346,58 @@ export const reducer = (state: State = initState, action: Actions) => {
         const droppedTask = draft.tasks.find(
           v => v.uuid === action.payload.droppedTaskUuid
         );
-        const moveTask = draft.tasks.find(
+        const draggedTask = draft.tasks.find(
           v => v.uuid === action.payload.draggedTaskUuid
         );
 
-        if (droppedTask == null || moveTask == null) {
+        if (droppedTask == null || draggedTask == null) {
           return;
         }
 
         // ドロップ先のsectionに変更する
-        moveTask.sectionId = droppedTask.sectionId;
+        draggedTask.sectionId = droppedTask.sectionId;
 
         if (
           // 両方サブタスクの場合
           droppedTask.parentTaskUuid != null &&
-          moveTask.parentTaskUuid != null
+          draggedTask.parentTaskUuid != null
         ) {
           moveSubTaskToSubTask(
             draft.tasks,
-            moveTask,
+            draggedTask,
             droppedTask,
             action.payload.direction
           );
         } else if (
           // 両方サブタスクでない場合
           droppedTask.parentTaskUuid == null &&
-          moveTask.parentTaskUuid == null
+          draggedTask.parentTaskUuid == null
         ) {
           moveTaskToTask(
             draft.tasks,
-            moveTask,
+            draggedTask,
             droppedTask,
             action.payload.direction
           );
         } else if (
           // ドロップ先のタスクがサブタスクの場合
           droppedTask.parentTaskUuid != null &&
-          moveTask.parentTaskUuid == null
+          draggedTask.parentTaskUuid == null
         ) {
           moveTaskToSubTask(
             draft.tasks,
-            moveTask,
+            draggedTask,
             droppedTask,
             action.payload.direction
           );
         } else if (
           // ドラッグ対象のタスクがサブタスクの場合
           droppedTask.parentTaskUuid == null &&
-          moveTask.parentTaskUuid != null
+          draggedTask.parentTaskUuid != null
         ) {
           moveSubTaskToTask(
             draft.tasks,
-            moveTask,
+            draggedTask,
             droppedTask,
             action.payload.direction
           );
