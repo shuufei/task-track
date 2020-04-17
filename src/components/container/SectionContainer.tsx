@@ -122,7 +122,7 @@ export const SectionContainer: React.FC<Props> = props => {
       <TaskListContainer
         uuids={sectionTaskUuids}
         customCss={css`
-          margin-top: 4px;
+          margin-top: 8px;
           z-index: 0;
         `}
       />

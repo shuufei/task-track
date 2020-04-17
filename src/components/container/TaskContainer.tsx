@@ -212,7 +212,7 @@ export const TaskContainer: React.FC<Props> = props => {
       <div
         css={css`
           position: absolute;
-          top: -4px;
+          top: ${task?.parentTaskUuid != null ? '-2px' : '-4px'};
           left: 0;
           height: 1.5px;
           width: 100%;
@@ -227,7 +227,7 @@ export const TaskContainer: React.FC<Props> = props => {
         <div
           css={css`
             position: absolute;
-            bottom: -4px;
+            bottom: ${task?.parentTaskUuid != null ? '-4px' : '-6px'};
             left: 0;
             height: 2.5px;
             width: 100%;
@@ -246,7 +246,7 @@ export const TaskContainer: React.FC<Props> = props => {
             prevTaskUuid={i !== 0 ? task.subTaskUuids![i - 1] : undefined}
             key={uuid}
             customCss={css`
-              margin-top: 6px;
+              margin-top: 4px;
               margin-left: 24px;
             `}
           />

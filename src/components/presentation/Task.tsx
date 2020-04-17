@@ -163,8 +163,10 @@ export const Task = React.forwardRef<HTMLDivElement, Props>(
           <AdjustHeightToTextarea
             css={css`
               text-align: center;
-              opacity: ${props.subTaskUuids.length > 0 ? 0 : 1};
-              pointer-events: ${props.subTaskUuids.length > 0 ? 'none' : 'all'};
+              opacity: ${props.subTaskUuids.length > 0 || props.isDone ? 0 : 1};
+              pointer-events: ${props.subTaskUuids.length > 0 || props.isDone
+                ? 'none'
+                : 'all'};
             `}
             onClick={() => (props.isPlaying ? props.pause() : props.play())}
           >
@@ -174,7 +176,6 @@ export const Task = React.forwardRef<HTMLDivElement, Props>(
                 cursor: pointer;
                 width: 12px;
                 margin-left: 12px;
-                visibility: ${props.isDone ? 'hidden' : 'visible'};
               `}
             />
           </AdjustHeightToTextarea>
