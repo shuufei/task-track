@@ -5,23 +5,6 @@ import { State, initState } from '.';
 import { generateTask, Task } from 'model/task';
 import { generateSection } from 'model/section';
 
-export const removeSubTaskFromParent = (
-  tasks: Task[],
-  parentTaskUuid: string,
-  childTaskUuid: string
-) => {
-  const parentTask = tasks.find(v => v.uuid === parentTaskUuid);
-  if (parentTask == null || parentTask.subTaskUuids == null) {
-    return;
-  }
-  const subTaskIndex = parentTask.subTaskUuids.findIndex(
-    v => v === childTaskUuid
-  );
-  if (subTaskIndex !== -1) {
-    parentTask.subTaskUuids.splice(subTaskIndex, 1);
-  }
-};
-
 export const getParentTaskAndChildIndex = (
   tasks: Task[],
   parentTaskUuid: string,
@@ -37,6 +20,26 @@ export const getParentTaskAndChildIndex = (
   return childTaskIndex !== -1
     ? [parentTask, childTaskIndex]
     : [parentTask, undefined];
+};
+
+export const removeSubTaskFromParent = (
+  tasks: Task[],
+  parentTaskUuid: string,
+  childTaskUuid: string
+) => {
+  const [parentTask, childIndex] = getParentTaskAndChildIndex(
+    tasks,
+    parentTaskUuid,
+    childTaskUuid
+  );
+  if (
+    parentTask != null &&
+    parentTask.subTaskUuids != null &&
+    childIndex != null &&
+    childIndex !== -1
+  ) {
+    parentTask.subTaskUuids.splice(childIndex, 1);
+  }
 };
 
 export const addSubTaskToParent = (
@@ -318,27 +321,37 @@ export const reducer = (state: State = initState, action: Actions) => {
         const sectionTasks = draft.tasks.filter(
           v => v.sectionId === action.payload.sectionId
         );
-        const indexOfSection = sectionTasks.findIndex(
-          v => v.uuid === action.payload.uuid
-        );
 
         // 親タスクから関連を削除
         const deleteTask = draft.tasks[index];
         if (deleteTask.parentTaskUuid != null) {
-          removeSubTaskFromParent(
+          const [parent, childIndex] = getParentTaskAndChildIndex(
             draft.tasks,
             deleteTask.parentTaskUuid,
             deleteTask.uuid
           );
+          if (
+            parent != null &&
+            parent.subTaskUuids != null &&
+            childIndex != null
+          ) {
+            parent.subTaskUuids.splice(childIndex, 1);
+            if (childIndex > 0) {
+              draft.focusUuid = parent.subTaskUuids[childIndex - 1];
+            }
+          }
+        } else {
+          const taskIndexOfSection = sectionTasks.findIndex(
+            v => v.uuid === action.payload.uuid && v.parentTaskUuid == null
+          );
+          if (taskIndexOfSection > 0) {
+            const prevTaskOfSection = sectionTasks[taskIndexOfSection - 1];
+            draft.focusUuid = prevTaskOfSection.uuid;
+          }
         }
 
         if (index !== -1) {
           draft.tasks.splice(index, 1);
-        }
-
-        if (indexOfSection > 0) {
-          const prevTaskOfSection = sectionTasks[indexOfSection - 1];
-          draft.focusUuid = prevTaskOfSection.uuid;
         }
       });
     case 'MOVE_TASK':
