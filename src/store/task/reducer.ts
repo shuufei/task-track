@@ -257,6 +257,17 @@ const recursiveInvokeFnChildTask = (
   });
 };
 
+const updateParentTimesec = (tasks: Task[], parent: Task) => {
+  const timesec = parent.subTaskUuids!.reduce((acc, curr) => {
+    const task = tasks.find(v => v.uuid === curr);
+    if (task == null) {
+      return acc;
+    }
+    return acc + task.timesec;
+  }, 0);
+  parent.timesec = timesec;
+};
+
 export const reducer = (state: State = initState, action: Actions) => {
   switch (action.type) {
     case 'ADD_TASK':
@@ -367,14 +378,7 @@ export const reducer = (state: State = initState, action: Actions) => {
             draft.tasks,
             action.payload.task,
             parent => {
-              const timesec = parent.subTaskUuids!.reduce((acc, curr) => {
-                const task = draft.tasks.find(v => v.uuid === curr);
-                if (task == null) {
-                  return acc;
-                }
-                return acc + task.timesec;
-              }, 0);
-              parent.timesec = timesec;
+              updateParentTimesec(draft.tasks, parent);
             }
           );
         }
@@ -484,12 +488,30 @@ export const reducer = (state: State = initState, action: Actions) => {
           droppedTask.parentTaskUuid != null &&
           draggedTask.parentTaskUuid != null
         ) {
+          const draggedTaskParentTask = draft.tasks.find(
+            v => v.uuid === draggedTask.parentTaskUuid
+          );
           moveSubTaskToSubTask(
             draft.tasks,
             draggedTask,
             droppedTask,
             action.payload.direction
           );
+
+          // ドラッグされたタスクの親のtimesecを再帰的に更新
+          updateParentTimesec(draft.tasks, draggedTaskParentTask!);
+          recursiveInvokeFnParentTask(
+            draft.tasks,
+            draggedTaskParentTask!,
+            parent => {
+              updateParentTimesec(draft.tasks, parent);
+            }
+          );
+
+          // ドロップされたタスクの親のtimeseを再帰的に更新
+          recursiveInvokeFnParentTask(draft.tasks, draggedTask, parent => {
+            updateParentTimesec(draft.tasks, parent);
+          });
         } else if (
           // 両方サブタスクでない場合
           droppedTask.parentTaskUuid == null &&
@@ -512,16 +534,31 @@ export const reducer = (state: State = initState, action: Actions) => {
             droppedTask,
             action.payload.direction
           );
+          recursiveInvokeFnParentTask(draft.tasks, draggedTask, parent => {
+            updateParentTimesec(draft.tasks, parent);
+          });
         } else if (
           // ドラッグ対象のタスクがサブタスクの場合
           droppedTask.parentTaskUuid == null &&
           draggedTask.parentTaskUuid != null
         ) {
+          const draggedTaskParentTask = draft.tasks.find(
+            v => v.uuid === draggedTask.parentTaskUuid
+          );
           moveSubTaskToTask(
             draft.tasks,
             draggedTask,
             droppedTask,
             action.payload.direction
+          );
+          // ドラッグされたタスクの親のtimesecを再帰的に更新
+          updateParentTimesec(draft.tasks, draggedTaskParentTask!);
+          recursiveInvokeFnParentTask(
+            draft.tasks,
+            draggedTaskParentTask!,
+            parent => {
+              updateParentTimesec(draft.tasks, parent);
+            }
           );
         }
       });
