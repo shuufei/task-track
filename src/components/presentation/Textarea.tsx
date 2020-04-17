@@ -124,6 +124,7 @@ export const Textarea = React.forwardRef<Handler, Props>((props, ref) => {
       placeholder={props.placeholder}
       rows={1}
       onKeyDown={event => onKeyDown(event)}
+      spellCheck={false}
     />
   );
 });
