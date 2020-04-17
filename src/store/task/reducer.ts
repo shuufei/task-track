@@ -215,6 +215,48 @@ const moveSubTaskToTask = (
   draggedTask.parentTaskUuid = undefined;
 };
 
+const recursiveInvokeFnParentTask = (
+  tasks: Task[],
+  task: Task,
+  fn: (parent: Task) => void
+) => {
+  let isExistParent = task.parentTaskUuid != null;
+  let childTask = task;
+  while (isExistParent) {
+    const _childTask = childTask;
+    const parentTask = tasks.find(v => v.uuid === _childTask.parentTaskUuid);
+    if (
+      parentTask == null ||
+      (parentTask != null && parentTask.subTaskUuids == null)
+    ) {
+      return;
+    }
+    fn(parentTask);
+    isExistParent = parentTask.parentTaskUuid != null;
+    childTask = parentTask;
+  }
+};
+
+const recursiveInvokeFnChildTask = (
+  tasks: Task[],
+  task: Task,
+  fn: (child: Task) => void
+) => {
+  if (!(task.subTaskUuids != null && task.subTaskUuids.length > 0)) {
+    return;
+  }
+
+  let childTaskUuids = task.subTaskUuids;
+  childTaskUuids?.forEach(uuid => {
+    const childTask = tasks.find(v => v.uuid === uuid);
+    if (childTask == null) {
+      return;
+    }
+    fn(childTask);
+    recursiveInvokeFnChildTask(tasks, childTask, fn);
+  });
+};
+
 export const reducer = (state: State = initState, action: Actions) => {
   switch (action.type) {
     case 'ADD_TASK':
@@ -309,8 +351,75 @@ export const reducer = (state: State = initState, action: Actions) => {
         const index = draft.tasks.findIndex(
           v => v.uuid === action.payload.task.uuid
         );
+        const isChangedTimesec =
+          draft.tasks[index].timesec !== action.payload.task.timesec;
+        const isChangedIsPlaying =
+          draft.tasks[index].isPlaying !== action.payload.task.isPlaying;
+        const isChangedIsDone =
+          draft.tasks[index].isDone !== action.payload.task.isDone;
         if (index !== -1) {
           draft.tasks[index] = action.payload.task;
+        }
+
+        // 親タスクのtimesecを再帰的に更新する
+        if (isChangedTimesec && action.payload.task.parentTaskUuid != null) {
+          recursiveInvokeFnParentTask(
+            draft.tasks,
+            action.payload.task,
+            parent => {
+              const timesec = parent.subTaskUuids!.reduce((acc, curr) => {
+                const task = draft.tasks.find(v => v.uuid === curr);
+                if (task == null) {
+                  return acc;
+                }
+                return acc + task.timesec;
+              }, 0);
+              parent.timesec = timesec;
+            }
+          );
+        }
+
+        // 親タスクの再生状態を再帰的に更新する
+        if (isChangedIsPlaying && action.payload.task.parentTaskUuid != null) {
+          recursiveInvokeFnParentTask(
+            draft.tasks,
+            action.payload.task,
+            parent => {
+              parent.isPlaying = action.payload.task.isPlaying;
+            }
+          );
+        }
+
+        // 子タスクの完了状態と再生状態を再帰的に更新する
+        if (
+          isChangedIsDone &&
+          action.payload.task.subTaskUuids != null &&
+          action.payload.task.subTaskUuids.length > 0 &&
+          action.payload.task.isDone
+        ) {
+          recursiveInvokeFnChildTask(
+            draft.tasks,
+            action.payload.task,
+            child => {
+              child.isDone = true;
+              child.isPlaying = false;
+            }
+          );
+        }
+
+        // 親タスクの完了状態を再帰的に更新する
+        if (
+          isChangedIsDone &&
+          action.payload.task.parentTaskUuid != null &&
+          !action.payload.task.isDone
+        ) {
+          recursiveInvokeFnParentTask(
+            draft.tasks,
+            action.payload.task,
+            parent => {
+              parent.isDone = false;
+            }
+          );
         }
       });
     case 'DELETE_TASK':
@@ -517,6 +626,12 @@ export const reducer = (state: State = initState, action: Actions) => {
 
         // 親タスクのuuidを保持
         draft.tasks[movedTaskIndex].parentTaskUuid = parent.uuid;
+      });
+    case 'PAUSE_ALL_TASK':
+      return produce(state, draft => {
+        draft.tasks.forEach(v => {
+          v.isPlaying = false;
+        });
       });
     default:
       return state;

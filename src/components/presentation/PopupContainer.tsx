@@ -9,6 +9,7 @@ export type Props = {
   popup: JSX.Element;
   keep?: boolean;
   position?: 'right' | 'left';
+  readonly?: boolean;
   custonCss?: SerializedStyles;
 };
 
@@ -61,7 +62,7 @@ export const PopupContainer: React.FC<Props> = props => {
         position: relative;
         ${props.custonCss};
       `}
-      onClick={handleToggleButtonClick}
+      onClick={!props.readonly ? handleToggleButtonClick : () => {}}
       ref={popupRef}
     >
       {props.popupTriger}

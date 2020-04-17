@@ -21,6 +21,7 @@ export type Props = {
   isDone: boolean;
   isPlaying: boolean;
   comments: string[];
+  subTaskUuids: string[];
   addComment: () => void;
   delete: () => void;
   addSec: (sec: number, current: number) => void;
@@ -38,6 +39,7 @@ export type Props = {
 
 export const Task = React.forwardRef<HTMLDivElement, Props>(
   (props, handleRef) => {
+    const [isHover, setIsHover] = useState(false);
     const [focusCommentIndex, setFocusCommentIndex] = useState<number | null>(
       null
     );
@@ -88,10 +90,16 @@ export const Task = React.forwardRef<HTMLDivElement, Props>(
           padding: 6px 16px 6px 10px;
           border-radius: 3px;
           border: solid 1px
-            ${props.isPlaying ? colors.primary500 : 'rgba(0,0,0,0)'};
+            ${props.isPlaying
+              ? colors.primary500
+              : isHover
+              ? colors.black500
+              : colors.transparent};
           ${shadow};
           ${props.customCss};
         `}
+        onMouseEnter={() => setIsHover(true)}
+        onMouseLeave={() => setIsHover(false)}
       >
         <div
           css={css`
@@ -149,11 +157,14 @@ export const Task = React.forwardRef<HTMLDivElement, Props>(
               subtractSec={(sec, currentSec) =>
                 props.subtractSec(sec, currentSec)
               }
+              readonly={props.subTaskUuids.length > 0}
             />
           </AdjustHeightToTextarea>
           <AdjustHeightToTextarea
             css={css`
               text-align: center;
+              opacity: ${props.subTaskUuids.length > 0 ? 0 : 1};
+              pointer-events: ${props.subTaskUuids.length > 0 ? 'none' : 'all'};
             `}
             onClick={() => (props.isPlaying ? props.pause() : props.play())}
           >

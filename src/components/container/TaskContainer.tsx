@@ -67,6 +67,10 @@ export const TaskContainer: React.FC<Props> = props => {
     if (task == null) {
       return;
     }
+    if (isPlaying) {
+      // 一度に記録可能なタスクは一つなので、一回全てのタスクを一時停止
+      dispatch(actionCreator.task.pauseAllTask());
+    }
     updateTask({
       ...task,
       isPlaying: isPlaying,
@@ -190,6 +194,7 @@ export const TaskContainer: React.FC<Props> = props => {
           isDone={task?.isDone || false}
           isPlaying={task?.isPlaying || false}
           comments={task?.comments || []}
+          subTaskUuids={task?.subTaskUuids || []}
           addSec={(sec, current) => updateTimesec(current + sec)}
           subtractSec={(sec, current) => updateTimesec(current - sec)}
           done={isDone => updateIsDone(isDone)}

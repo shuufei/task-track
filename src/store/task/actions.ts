@@ -60,6 +60,9 @@ export interface MoveToSubTaskAction extends Action {
   type: 'MOVE_TO_SUB_TASK';
   payload: { parentTaskUuid: string; task: Task };
 }
+export interface PauseAllTaskAction extends Action {
+  type: 'PAUSE_ALL_TASK';
+}
 export type Actions =
   | AddTaskAction
   | AddTaskToSectionAction
@@ -73,7 +76,8 @@ export type Actions =
   | UpdateSectionTitleAction
   | DeleteSectionAction
   | MoveDragSectionAction
-  | MoveToSubTaskAction;
+  | MoveToSubTaskAction
+  | PauseAllTaskAction;
 
 /** Action Creators */
 export const addTask = (payload: AddTaskAction['payload']): AddTaskAction => ({
@@ -137,6 +141,9 @@ export const moveDragSection = (
 export const moveToSubTask = (
   payload: MoveToSubTaskAction['payload']
 ): MoveToSubTaskAction => ({ type: 'MOVE_TO_SUB_TASK', payload });
+export const pauseAllTask = (): PauseAllTaskAction => ({
+  type: 'PAUSE_ALL_TASK'
+});
 export const actionCreator = {
   addTask,
   addTaskToSection,
@@ -150,5 +157,6 @@ export const actionCreator = {
   updateSectionTitle,
   deleteSection,
   moveDragSection,
-  moveToSubTask
+  moveToSubTask,
+  pauseAllTask
 };
