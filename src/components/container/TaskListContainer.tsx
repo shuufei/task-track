@@ -29,7 +29,7 @@ export const TaskListContainer: React.FC<Props> = props => {
             customCss={
               i > 0
                 ? css`
-                    margin-top: 8px;
+                    margin-top: 6px;
                   `
                 : undefined
             }
