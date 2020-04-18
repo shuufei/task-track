@@ -12,8 +12,6 @@ import { AdjustHeightToTextarea, Handler } from './Textarea';
 import { Comment } from './Comment';
 import { TaskTextarea } from './TaskTextare';
 
-export const DRAG_TYPE_TASK = 'TASK';
-
 export type Props = {
   uuid: string;
   title: string;
