@@ -12,6 +12,7 @@ export type Props = {
   comments: string[];
   timesec: number;
   maxTimesec: number;
+  isSubTask?: boolean;
   customCss?: SerializedStyles;
 };
 
@@ -68,7 +69,7 @@ export const TaskReport: React.FC<Props> = props => {
               css={css`
                 margin-left: 16px;
                 ${typography.caption};
-                color: ${colors.black350};
+                color: ${colors.black300};
               `}
             >
               {isOpenComments ? 'Hidden Comments' : 'Show Comments'}
@@ -124,9 +125,13 @@ export const TaskReport: React.FC<Props> = props => {
             width: 0%;
             height: 100%;
             border-radius: 0 2px 2px 0;
-            background-color: ${isHover
-              ? colors.primaryDark
-              : colors.primary400};
+            background-color: ${!props.isSubTask
+              ? isHover
+                ? colors.primaryDark
+                : colors.primary400
+              : isHover
+              ? colors.black350
+              : colors.black300};
             animation: ${stretch} ${ANIMATION_DURATION_SEC}s
               ${ANIMATION_DELAY_SEC}s ease-out forwards;
           `}
@@ -142,7 +147,7 @@ export const TaskReport: React.FC<Props> = props => {
               -50%
             );
             ${typography.caption};
-            color: ${isHover ? colors.black500 : colors.black300};
+            color: ${isHover ? colors.black500 : colors.black350};
             opacity: 0;
             animation: ${fadeIn} 0.2s
               ${ANIMATION_DURATION_SEC + ANIMATION_DELAY_SEC}s ease-out forwards;

@@ -19,7 +19,7 @@ export const SectionReportContainer: React.FC<Props> = props => {
   const taskUuids = useSelector((state: RootState) => {
     const tasks = state.task.tasks
       .filter(v => v.sectionId === props.sectionId)
-      .filter(v => v.timesec > 0);
+      .filter(v => v.timesec > 0 && v.parentTaskUuid == null);
     if (isSortByTime) {
       tasks.sort((v1, v2) => v2.timesec - v1.timesec);
     }
@@ -101,7 +101,7 @@ export const SectionReportContainer: React.FC<Props> = props => {
             <div
               css={css`
                 width: 1px;
-                background-color: ${colors.black300};
+                background-color: ${colors.black350};
               `}
             />
             <div
