@@ -34,10 +34,15 @@ export const useTaskDrag = (
 };
 
 export const useTaskDrop = (
-  dropCallback: (isDraggedTaskUuid: string, isOverLowerBody: boolean) => void
+  dropCallback: (
+    isDraggedTaskUuid: string,
+    isOverLowerBody: boolean,
+    isOverSubTaskArea: boolean
+  ) => void
 ): [
   React.RefObject<HTMLDivElement>,
   DragObjectType,
+  boolean,
   boolean,
   boolean,
   boolean
@@ -45,10 +50,11 @@ export const useTaskDrop = (
   const dropRef = useRef<HTMLDivElement>(null);
   const [isOverUpperBody, setIsOverUpperBody] = useState(false);
   const [isOverLowerBody, setIsOverLowerBody] = useState(false);
+  const [isOverSubTaskArea, setIsOverSubTaskArea] = useState(false);
   const [{ draggedItem, isOver }, connectDrop] = useDrop({
     accept: DRAG_TYPE_TASK,
     drop: (v: DragObjectType) => {
-      dropCallback(v.uuid, isOverLowerBody);
+      dropCallback(v.uuid, isOverLowerBody, isOverSubTaskArea);
       setIsOverUpperBody(false);
       setIsOverLowerBody(false);
     },
@@ -64,8 +70,10 @@ export const useTaskDrop = (
         return;
       }
       const hoverClientY = clientOffset.y - hoverBoundingRect.top;
+      const hoverClientX = clientOffset.x - hoverBoundingRect.left;
       setIsOverUpperBody(hoverClientY < hoverMiddleY);
       setIsOverLowerBody(hoverClientY > hoverMiddleY);
+      setIsOverSubTaskArea(hoverClientX > 24);
     },
     collect: monitor => {
       return {
@@ -80,6 +88,7 @@ export const useTaskDrop = (
     draggedItem,
     isOver,
     isOver && isOverUpperBody,
-    isOver && isOverLowerBody
+    isOver && isOverLowerBody,
+    isOver && isOverSubTaskArea
   ];
 };

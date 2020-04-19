@@ -62,7 +62,7 @@ export interface MoveSectionAction extends Action {
 }
 export interface MoveToSubTaskAction extends Action {
   type: 'MOVE_TO_SUB_TASK';
-  payload: { parentTaskUuid: string; task: Task };
+  payload: { parentTaskUuid: string; taskUuid: string };
 }
 export interface PauseAllTaskAction extends Action {
   type: 'PAUSE_ALL_TASK';

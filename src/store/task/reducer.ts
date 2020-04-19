@@ -663,12 +663,14 @@ export const reducer = (state: State = initState, action: Actions) => {
         const parent = draft.tasks.find(
           v => v.uuid === action.payload.parentTaskUuid
         );
-        if (parent == null) {
+        const movedTask = draft.tasks.find(
+          v => v.uuid === action.payload.taskUuid
+        );
+        if (parent == null || movedTask == null) {
           return;
         }
 
         // Sectionを合わせる
-        const movedTask = { ...action.payload.task };
         movedTask.sectionId = parent.sectionId;
 
         // 親のタスクのsubTaskに追加

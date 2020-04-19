@@ -138,7 +138,11 @@ export const TaskContainer: React.FC<Props> = props => {
     };
   }, [task, updateTask]);
   const moveTask = useCallback(
-    (draggedTaskUuid: string, isOverLowerBody: boolean) => {
+    (
+      draggedTaskUuid: string,
+      isOverLowerBody: boolean,
+      isOverSubTaskArea: boolean
+    ) => {
       if (props.uuid === draggedTaskUuid) {
         return;
       }
@@ -154,6 +158,14 @@ export const TaskContainer: React.FC<Props> = props => {
           direction: isOverLowerBody ? 'next' : 'prev'
         })
       );
+      if (isOverLowerBody && isOverSubTaskArea) {
+        dispatch(
+          actionCreator.task.moveToSubTask({
+            parentTaskUuid: props.uuid,
+            taskUuid: draggedTaskUuid
+          })
+        );
+      }
     },
     [dispatch, props.uuid, isHaveSubtasks]
   );
@@ -180,7 +192,8 @@ export const TaskContainer: React.FC<Props> = props => {
     draggedItem,
     ,
     isOverUpperBody,
-    isOverLowerBody
+    isOverLowerBody,
+    isOverSubTaskArea
   ] = useTaskDrop(moveTask);
   const [handleRef, previewRef] = useTaskDrag(props.uuid, setIsDragging);
 
@@ -240,6 +253,7 @@ export const TaskContainer: React.FC<Props> = props => {
             left: 0;
             height: 2.5px;
             width: 100%;
+            margin-left: ${isOverSubTaskArea ? '24px;' : ''};
             background-color: ${isOverLowerBody &&
             draggedItem?.uuid !== props.uuid &&
             draggedItem?.uuid !== task?.parentTaskUuid
