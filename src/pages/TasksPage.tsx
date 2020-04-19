@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 /** @jsx jsx */
 import { jsx, css } from '@emotion/core';
@@ -9,6 +9,7 @@ import { RootState, actionCreator } from 'store';
 import { SectionContainer } from 'components/container/SectionContainer';
 import * as typography from 'styles/typography';
 import { colors } from 'styles/color';
+import { useInit } from 'hooks/init';
 
 export const SectionIdContext = React.createContext<string | undefined>(
   undefined
@@ -20,17 +21,12 @@ export const TasksPage: React.FC = () => {
   );
   const dispatch = useDispatch();
 
-  const [initialized, setInitialized] = useState(false);
-  useEffect(() => {
-    if (initialized) {
-      return;
-    }
+  useInit(() => {
     dispatch(actionCreator.task.updateFocusTaskUuid({ uuid: undefined }));
     if (sectionIds.length === 0) {
       dispatch(actionCreator.task.addSection());
     }
-    setInitialized(true);
-  }, [dispatch, initialized, setInitialized, sectionIds]);
+  });
 
   return (
     <div

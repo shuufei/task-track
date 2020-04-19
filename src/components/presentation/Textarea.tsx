@@ -4,6 +4,7 @@ import { jsx, css, SerializedStyles } from '@emotion/core';
 
 import { colors } from 'styles/color';
 import * as typography from 'styles/typography';
+import { useInit } from 'hooks/init';
 
 export const INITIAL_HEIGHT = '27px';
 export const IME_ENTER_KEY_CODE = 229;
@@ -35,7 +36,6 @@ export type Handler = {
 
 export const Textarea = React.forwardRef<Handler, Props>((props, ref) => {
   const [localValue, setLocalValue] = useState('');
-  const [initialized, setInitialized] = useState(false);
 
   const innerRef = useRef<HTMLTextAreaElement>(null);
   useImperativeHandle(ref, () => ({
@@ -55,13 +55,15 @@ export const Textarea = React.forwardRef<Handler, Props>((props, ref) => {
     innerRef.current.style.height = `${innerRef.current.scrollHeight}px`;
   };
 
-  useEffect(() => {
-    if (!initialized && props.value) {
+  useInit(() => {
+    if (props.value) {
       setLocalValue(props.value);
-      setInitialized(true);
     }
+  });
+
+  useEffect(() => {
     adjustHeight();
-  }, [props.value, initialized]);
+  }, [props.value]);
 
   const onKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
     switch (event.key as Key) {

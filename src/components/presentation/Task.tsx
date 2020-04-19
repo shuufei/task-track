@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 /** @jsx jsx */
 import { jsx, css, SerializedStyles } from '@emotion/core';
+import { v4 as uuidv4 } from 'uuid';
 
 import { colors } from 'styles/color';
 import { shadow } from 'styles/shadow';
@@ -12,6 +13,12 @@ import { AdjustHeightToTextarea, Handler } from './Textarea';
 import { Comment } from './Comment';
 import { TaskTextarea } from './TaskTextare';
 import { useDebounce } from 'hooks/debounce';
+import { useInit } from 'hooks/init';
+
+type Comment = {
+  id: string;
+  text: string;
+};
 
 export type Props = {
   uuid: string;
@@ -38,27 +45,26 @@ export type Props = {
 
 export const Task = React.forwardRef<HTMLDivElement, Props>(
   (props, handleRef) => {
-    const [initialized, setInitialized] = useState(false);
     const [isHover, setIsHover] = useState(false);
     const [focusCommentIndex, setFocusCommentIndex] = useState<number | null>(
       null
     );
     const [beforeFocus, setBeforeFocus] = useState(false);
-    const [comments, setComments] = useState<string[]>([]);
+    const [comments, setComments] = useState<Comment[]>([]);
     const innerRef = useRef<Handler>(null);
 
+    useInit(() => {
+      setComments(props.comments.map(v => ({ id: uuidv4(), text: v })));
+    });
+
     useEffect(() => {
-      if (!initialized) {
-        setComments(props.comments);
-        setInitialized(true);
-      }
       if (props.focus != null && props.focus !== beforeFocus) {
         setBeforeFocus(props.focus);
         if (props.focus && innerRef.current != null) {
           innerRef.current.focus();
         }
       }
-    }, [beforeFocus, props.focus, initialized, setInitialized, props.comments]);
+    }, [beforeFocus, props.focus, props.comments]);
 
     const focusPrevComment = (currentIndex: number) => {
       setFocusCommentIndex(currentIndex === 0 ? 0 : currentIndex - 1);
@@ -83,11 +89,11 @@ export const Task = React.forwardRef<HTMLDivElement, Props>(
     const [invokeEmitEditComments] = useDebounce(500);
     const editComment = (comment: string, index: number) => {
       const tmpComments = [...comments];
-      tmpComments[index] = comment;
+      tmpComments[index].text = comment;
       setComments(tmpComments);
       setFocusCommentIndex(index);
       invokeEmitEditComments(() => {
-        props.editComments([...tmpComments]);
+        props.editComments(tmpComments.map(v => v.text));
       });
     };
     const deleteComment = (index: number) => {
@@ -96,16 +102,16 @@ export const Task = React.forwardRef<HTMLDivElement, Props>(
       setComments(tmpComments);
       setFocusCommentIndex(index === 0 ? 0 : index - 1);
       invokeEmitEditComments(() => {
-        props.editComments([...tmpComments]);
+        props.editComments(tmpComments.map(v => v.text));
       });
     };
     const addComment = (index: number) => {
       const tmpComments = [...comments];
-      tmpComments.splice(index, 0, '');
+      tmpComments.splice(index, 0, { id: uuidv4(), text: '' });
       setComments(tmpComments);
       setFocusCommentIndex(index);
       invokeEmitEditComments(() => {
-        props.editComments([...tmpComments]);
+        props.editComments(tmpComments.map(v => v.text));
       });
     };
 
@@ -227,10 +233,10 @@ export const Task = React.forwardRef<HTMLDivElement, Props>(
                   css={css`
                     margin-top: ${i !== 0 ? '2px' : 0};
                   `}
-                  key={`${i}-${comment}`}
+                  key={`${i}-${comment.id}`}
                 >
                   <Comment
-                    comment={comment}
+                    comment={comment.text}
                     editComment={comment => editComment(comment, i)}
                     delete={() => deleteComment(i)}
                     generateNextComment={() => addComment(i + 1)}
