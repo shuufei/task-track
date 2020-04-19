@@ -35,6 +35,7 @@ export type Handler = {
 
 export const Textarea = React.forwardRef<Handler, Props>((props, ref) => {
   const [localValue, setLocalValue] = useState('');
+  const [initialized, setInitialized] = useState(false);
 
   const innerRef = useRef<HTMLTextAreaElement>(null);
   useImperativeHandle(ref, () => ({
@@ -55,8 +56,12 @@ export const Textarea = React.forwardRef<Handler, Props>((props, ref) => {
   };
 
   useEffect(() => {
+    if (!initialized && props.value) {
+      setLocalValue(props.value);
+      setInitialized(true);
+    }
     adjustHeight();
-  });
+  }, [props.value, initialized]);
 
   const onKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
     switch (event.key as Key) {
@@ -99,13 +104,14 @@ export const Textarea = React.forwardRef<Handler, Props>((props, ref) => {
   return (
     <textarea
       ref={innerRef}
-      value={props.value ?? localValue}
+      value={localValue}
       onInput={() => adjustHeight()}
-      onChange={event =>
-        props.changeValue != null
-          ? props.changeValue(event.target.value)
-          : setLocalValue(event.target.value)
-      }
+      onChange={event => {
+        setLocalValue(event.target.value);
+        if (props.changeValue != null) {
+          props.changeValue(event.target.value);
+        }
+      }}
       css={css`
         width: 100%;
         border: none;

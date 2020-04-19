@@ -362,12 +362,18 @@ export const reducer = (state: State = initState, action: Actions) => {
         const index = draft.tasks.findIndex(
           v => v.uuid === action.payload.task.uuid
         );
+
+        if (draft.tasks[index] == null) {
+          return;
+        }
+
         const isChangedTimesec =
           draft.tasks[index].timesec !== action.payload.task.timesec;
         const isChangedIsPlaying =
           draft.tasks[index].isPlaying !== action.payload.task.isPlaying;
         const isChangedIsDone =
           draft.tasks[index].isDone !== action.payload.task.isDone;
+
         if (index !== -1) {
           draft.tasks[index] = action.payload.task;
         }

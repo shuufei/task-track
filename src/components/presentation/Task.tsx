@@ -11,6 +11,7 @@ import { Icon } from './Icon';
 import { AdjustHeightToTextarea, Handler } from './Textarea';
 import { Comment } from './Comment';
 import { TaskTextarea } from './TaskTextare';
+import { useDebounce } from 'hooks/debounce';
 
 export type Props = {
   uuid: string;
@@ -37,47 +38,75 @@ export type Props = {
 
 export const Task = React.forwardRef<HTMLDivElement, Props>(
   (props, handleRef) => {
+    const [initialized, setInitialized] = useState(false);
     const [isHover, setIsHover] = useState(false);
     const [focusCommentIndex, setFocusCommentIndex] = useState<number | null>(
       null
     );
     const [beforeFocus, setBeforeFocus] = useState(false);
+    const [comments, setComments] = useState<string[]>([]);
     const innerRef = useRef<Handler>(null);
+
     useEffect(() => {
+      if (!initialized) {
+        setComments(props.comments);
+        setInitialized(true);
+      }
       if (props.focus != null && props.focus !== beforeFocus) {
         setBeforeFocus(props.focus);
         if (props.focus && innerRef.current != null) {
           innerRef.current.focus();
         }
       }
-    }, [beforeFocus, props.focus]);
-    const deleteComment = (index: number) => {
-      const comments = [...props.comments];
-      comments.splice(index, 1);
-      props.editComments([...comments]);
-      setFocusCommentIndex(index === 0 ? 0 : index - 1);
-    };
-    const addComment = (index: number) => {
-      const comments = [...props.comments];
-      comments.splice(index, 0, '');
-      props.editComments([...comments]);
-      setFocusCommentIndex(index);
-    };
-    const editComment = (comment: string, index: number) => {
-      const comments = [...props.comments];
-      comments[index] = comment;
-      props.editComments([...comments]);
-      setFocusCommentIndex(index);
-    };
+    }, [beforeFocus, props.focus, initialized, setInitialized, props.comments]);
+
     const focusPrevComment = (currentIndex: number) => {
       setFocusCommentIndex(currentIndex === 0 ? 0 : currentIndex - 1);
     };
     const focusNextComment = (currentIndex: number) => {
       setFocusCommentIndex(
-        currentIndex === props.comments.length - 1
-          ? currentIndex
-          : currentIndex + 1
+        currentIndex === comments.length - 1 ? currentIndex : currentIndex + 1
       );
+    };
+
+    // パフォーマンスを考慮し、タイトル編集時に毎回props.editTitleを実行しない。
+    // 変更イベントから500ms以内に次のイベントが発生しなかった場合に、props.editTitleを実行する。
+    const [invokeEmitEditTitle] = useDebounce(500);
+    const editTitle = (value: string) => {
+      invokeEmitEditTitle(() => {
+        props.editTitle(value);
+      });
+    };
+
+    // パフォーマンスを考慮し、コメント編集時に毎回props.editCommentを実行しない。
+    // 変更イベントから500ms以内に次のイベントが発生しなかった場合に、props.editCommentを実行する。
+    const [invokeEmitEditComments] = useDebounce(500);
+    const editComment = (comment: string, index: number) => {
+      const tmpComments = [...comments];
+      tmpComments[index] = comment;
+      setComments(tmpComments);
+      setFocusCommentIndex(index);
+      invokeEmitEditComments(() => {
+        props.editComments([...tmpComments]);
+      });
+    };
+    const deleteComment = (index: number) => {
+      const tmpComments = [...comments];
+      tmpComments.splice(index, 1);
+      setComments(tmpComments);
+      setFocusCommentIndex(index === 0 ? 0 : index - 1);
+      invokeEmitEditComments(() => {
+        props.editComments([...tmpComments]);
+      });
+    };
+    const addComment = (index: number) => {
+      const tmpComments = [...comments];
+      tmpComments.splice(index, 0, '');
+      setComments(tmpComments);
+      setFocusCommentIndex(index);
+      invokeEmitEditComments(() => {
+        props.editComments([...tmpComments]);
+      });
     };
 
     return (
@@ -114,7 +143,7 @@ export const Task = React.forwardRef<HTMLDivElement, Props>(
               `}
             >
               <Menu
-                addComment={() => addComment(props.comments.length)}
+                addComment={() => addComment(comments.length)}
                 delete={() => props.delete()}
               />
             </div>
@@ -133,7 +162,7 @@ export const Task = React.forwardRef<HTMLDivElement, Props>(
           <TaskTextarea
             title={props.title}
             ref={innerRef}
-            editTitle={props.editTitle}
+            editTitle={editTitle}
             onPressEnter={props.addTask}
             onPressTab={props.moveToSubtask}
             onPressDelete={props.delete}
@@ -178,7 +207,7 @@ export const Task = React.forwardRef<HTMLDivElement, Props>(
             />
           </AdjustHeightToTextarea>
         </div>
-        {props.comments.length > 0 ? (
+        {comments.length > 0 ? (
           <React.Fragment>
             <hr
               css={css`
@@ -193,12 +222,12 @@ export const Task = React.forwardRef<HTMLDivElement, Props>(
                 padding: 6px 8px 0 24px;
               `}
             >
-              {props.comments.map((comment, i) => (
+              {comments.map((comment, i) => (
                 <div
                   css={css`
                     margin-top: ${i !== 0 ? '2px' : 0};
                   `}
-                  key={i}
+                  key={`${i}-${comment}`}
                 >
                   <Comment
                     comment={comment}

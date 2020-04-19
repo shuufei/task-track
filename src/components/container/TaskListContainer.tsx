@@ -60,9 +60,9 @@ export const TaskListContainer: React.FC<Props> = props => {
         <div
           ref={taskDropRef}
           css={css`
-            height: 8px;
+            height: 12px;
             width: 100%;
-            margin-top: 12px;
+            margin-top: 4px;
             background-color: ${colors.transparent};
             display: flex;
             flex-direction: column;

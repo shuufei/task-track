@@ -19,9 +19,10 @@ export type Props = {
 export const TaskContainer: React.FC<Props> = props => {
   const [isDragging, setIsDragging] = useState(false);
 
-  const task = useSelector((state: RootState) =>
-    state.task.tasks.find(v => v.uuid === props.uuid)
+  const taskIndex = useSelector((state: RootState) =>
+    state.task.tasks.findIndex(v => v.uuid === props.uuid)
   );
+  const task = useSelector((state: RootState) => state.task.tasks[taskIndex]);
   const focusUuid = useSelector((state: RootState) => state.task.focusUuid);
   const dispatch = useDispatch();
   const sectionId = useContext(SectionIdContext);
