@@ -13,6 +13,7 @@ export type Props = {
   uuid: string;
   maxTimesec: number;
   isSubTask?: boolean;
+  isSortByTime?: boolean;
   customCss?: SerializedStyles;
 };
 
@@ -20,6 +21,15 @@ export const TaskReportContainer: React.FC<Props> = props => {
   const task = useSelector((state: RootState) =>
     state.task.tasks.find(v => v.uuid === props.uuid)
   );
+  const subTasks = useSelector((state: RootState) => {
+    const tasks = state.task.tasks.filter(v =>
+      task?.subTaskUuids?.includes(v.uuid)
+    );
+    if (props.isSortByTime) {
+      tasks.sort((v1, v2) => v2.timesec - v1.timesec);
+    }
+    return tasks;
+  });
   const [isShowSubtasks, setIsShowSubtasks] = useState(true);
   return (
     <div css={props.customCss}>
@@ -31,7 +41,7 @@ export const TaskReportContainer: React.FC<Props> = props => {
         isSubTask={props.isSubTask}
         customCss={props.customCss}
       />
-      {task?.subTaskUuids && task?.subTaskUuids.length > 0 && (
+      {subTasks.length > 0 && (
         <React.Fragment>
           <p
             css={css`
@@ -74,12 +84,13 @@ export const TaskReportContainer: React.FC<Props> = props => {
                   width: 100%;
                 `}
               >
-                {task.subTaskUuids.map((uuid, i) => (
+                {subTasks.map((v, i) => (
                   <TaskReportContainer
-                    uuid={uuid}
+                    uuid={v.uuid}
                     maxTimesec={props.maxTimesec}
                     isSubTask={true}
-                    key={uuid}
+                    isSortByTime={props.isSortByTime}
+                    key={v.uuid}
                     customCss={css`
                       margin-top: ${i > 0 ? `8px` : 0};
                     `}

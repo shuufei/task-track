@@ -115,6 +115,7 @@ export const SectionReportContainer: React.FC<Props> = props => {
                   uuid={uuid}
                   key={uuid + i + isSortByTime}
                   maxTimesec={maxTimesec}
+                  isSortByTime={isSortByTime}
                   customCss={
                     i > 0
                       ? css`
