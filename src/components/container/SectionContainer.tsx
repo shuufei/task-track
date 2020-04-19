@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, forwardRef } from 'react';
 /** @jsx jsx */
 import { jsx, css, SerializedStyles } from '@emotion/core';
 
@@ -9,9 +9,41 @@ import { RootState, actionCreator } from 'store';
 import { TaskListContainer } from './TaskListContainer';
 import { Menu } from 'components/presentation/Menu';
 import { useDrag, useDrop, DragObjectWithType } from 'react-dnd';
+import { colors } from 'styles/color';
+
+type SectionDropAreaProps = {
+  isOver: boolean;
+};
+const SectionDropArea = forwardRef<HTMLDivElement, SectionDropAreaProps>(
+  (props, dropRef) => {
+    return (
+      <div
+        ref={dropRef}
+        css={css`
+          width: 100%;
+          height: 24px;
+          background-color: ${colors.transparent};
+          display: flex;
+          align-items: center;
+        `}
+      >
+        <div
+          css={css`
+            width: 100%;
+            height: 3px;
+            background-color: ${props.isOver
+              ? colors.primary400
+              : colors.transparent};
+          `}
+        ></div>
+      </div>
+    );
+  }
+);
 
 export type Props = {
   sectionId: string;
+  isFirst?: boolean;
   customCss?: SerializedStyles;
 };
 
@@ -33,29 +65,54 @@ export const SectionContainer: React.FC<Props> = props => {
   const dispatch = useDispatch();
 
   const handleRef = useRef<HTMLDivElement>(null);
-  const dropRef = useRef<HTMLDivElement>(null);
+  const dropNextSectionRef = useRef<HTMLDivElement>(null);
+  const dropPrevSectionRef = useRef<HTMLDivElement>(null);
+
   const [{ isDragging }, connectDrag, previewRef] = useDrag({
     item: { id: props.sectionId, type: DRAG_TYPE_SECTION },
     collect: monitor => ({
       isDragging: monitor.isDragging()
     })
   });
-  const [, connectDrop] = useDrop({
+  const [{ isOverNextSection }, connectDropNextSection] = useDrop({
     accept: DRAG_TYPE_SECTION,
-    hover: (v: DragObjectType) => {
+    drop: (v: DragObjectType) => {
       if (v.id === props.sectionId) {
         return;
       }
       dispatch(
-        actionCreator.task.moveDragSection({
+        actionCreator.task.moveSection({
           draggedSectionId: v.id,
-          droppedSectionId: props.sectionId
+          droppedSectionId: props.sectionId,
+          direction: 'next'
         })
       );
-    }
+    },
+    collect: monitor => ({
+      isOverNextSection: !!monitor.isOver()
+    })
+  });
+  const [{ isOverPrevSection }, connectDropPrevSection] = useDrop({
+    accept: DRAG_TYPE_SECTION,
+    drop: (v: DragObjectType) => {
+      if (v.id === props.sectionId) {
+        return;
+      }
+      dispatch(
+        actionCreator.task.moveSection({
+          draggedSectionId: v.id,
+          droppedSectionId: props.sectionId,
+          direction: 'prev'
+        })
+      );
+    },
+    collect: monitor => ({
+      isOverPrevSection: !!monitor.isOver()
+    })
   });
   connectDrag(handleRef);
-  connectDrop(dropRef);
+  connectDropNextSection(dropNextSectionRef);
+  connectDropPrevSection(dropPrevSectionRef);
 
   return (
     <div
@@ -67,8 +124,10 @@ export const SectionContainer: React.FC<Props> = props => {
       onMouseEnter={() => setIsHoverSectionTitle(true)}
       onMouseLeave={() => setIsHoverSectionTitle(false)}
     >
+      {props.isFirst && (
+        <SectionDropArea isOver={isOverPrevSection} ref={dropPrevSectionRef} />
+      )}
       <div
-        ref={dropRef}
         css={css`
           position: relative;
           z-index: 1;
@@ -126,6 +185,7 @@ export const SectionContainer: React.FC<Props> = props => {
           z-index: 0;
         `}
       />
+      <SectionDropArea isOver={isOverNextSection} ref={dropNextSectionRef} />
     </div>
   );
 };

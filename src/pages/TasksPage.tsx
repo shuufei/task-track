@@ -31,7 +31,7 @@ export const TasksPage: React.FC = () => {
   return (
     <div
       css={css`
-        padding: 12px 24px 24px;
+        padding: 0 24px 24px;
       `}
     >
       <DndProvider backend={Backend}>
@@ -39,8 +39,9 @@ export const TasksPage: React.FC = () => {
           <SectionIdContext.Provider value={v} key={v}>
             <SectionContainer
               sectionId={v}
+              isFirst={i === 0}
               customCss={css`
-                margin-top: ${i === 0 ? '12px' : '24px'};
+                margin-top: ${i === 0 ? '0' : '12px'};
               `}
             />
           </SectionIdContext.Provider>

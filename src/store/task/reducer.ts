@@ -604,7 +604,7 @@ export const reducer = (state: State = initState, action: Actions) => {
           draft.tasks.splice(taskIndex, 1);
         });
       });
-    case 'MOVE_DRAG_SECTION':
+    case 'MOVE_SECTION':
       return produce(state, draft => {
         const droppedSectionIndex = draft.sections.findIndex(
           v => v.id === action.payload.droppedSectionId
@@ -619,9 +619,8 @@ export const reducer = (state: State = initState, action: Actions) => {
           return;
         }
 
-        // 移動先のindex。移動もとのsectionはまだ削除していないので、移動下より後方にある場合は、1プラスする。
         const distIndex =
-          droppedSectionIndex > moveSectionIndex
+          action.payload.direction === 'next'
             ? droppedSectionIndex + 1
             : droppedSectionIndex;
         draft.sections.splice(distIndex, 0, draft.sections[moveSectionIndex]);
