@@ -8,6 +8,7 @@ import * as typography from 'styles/typography';
 export type Props = {
   addComments?: (...args: any[]) => void;
   delete?: (...args: any[]) => void;
+  addSubTask?: (...args: any[]) => void;
 };
 
 export const MenuPanel: React.FC<Props> = props => {
@@ -20,23 +21,34 @@ export const MenuPanel: React.FC<Props> = props => {
       `}
     >
       {props.addComments != null && (
-        <button
-          css={buttonStyle}
-          onClick={() =>
-            props.addComments != null ? props.addComments() : null
-          }
-        >
+        <button css={buttonStyle} onClick={() => props.addComments!()}>
           Add Comment
+        </button>
+      )}
+      {props.addSubTask != null && (
+        <button
+          css={css`
+            margin-top: ${props.addComments != null ? '4px' : 0};
+            ${buttonStyle}
+          `}
+          onClick={() => props.addSubTask!()}
+        >
+          Add Sub-Task
         </button>
       )}
       {props.delete != null && (
         <button
           css={css`
             ${buttonStyle}
-            margin-top: ${props.addComments != null ? '4px' : 0};
+            margin-top: ${
+              (props.addComments != null && props.addSubTask == null) ||
+              props.addSubTask != null
+                ? '4px'
+                : 0
+            };
             color: ${colors.red500};
           `}
-          onClick={() => (props.delete != null ? props.delete() : null)}
+          onClick={() => props.delete!()}
         >
           Delete
         </button>

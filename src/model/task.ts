@@ -10,6 +10,8 @@ export type Task = {
   timesecUpdatedTimestamp?: number;
   updatedAt: Date;
   sectionId?: string;
+  subTaskUuids?: string[];
+  parentTaskUuid?: string;
 };
 
 export const generateTask = (): Task => ({
@@ -19,5 +21,6 @@ export const generateTask = (): Task => ({
   timesec: 0,
   isPlaying: false,
   comments: [],
-  updatedAt: new Date()
+  updatedAt: new Date(),
+  subTaskUuids: []
 });

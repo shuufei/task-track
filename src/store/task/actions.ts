@@ -2,21 +2,24 @@ import { Action } from 'redux';
 import { Task } from 'model/task';
 import { Section } from 'model/section';
 
+export type MoveDirection = 'prev' | 'next';
+
 /** Action Definitions */
 export interface AddTaskAction extends Action {
   type: 'ADD_TASK';
+  payload: { parentTaskUuid?: string };
 }
 export interface AddTaskToSectionAction extends Action {
   type: 'ADD_TASK_TO_SECTION';
-  payload: { sectionId: string };
+  payload: { sectionId: string; parentTaskUuid?: string };
 }
 export interface AddTaskByUuidAction extends Action {
   type: 'ADD_TASK_BY_UUID';
-  payload: { uuid: string };
+  payload: { uuid: string; parentTaskUuid?: string };
 }
 export interface AddTaskByUuidToSectionAction extends Action {
   type: 'ADD_TASK_BY_UUID_TO_SECTION';
-  payload: { uuid: string; sectionId: string };
+  payload: { uuid: string; sectionId: string; parentTaskUuid?: string };
 }
 export interface UpdateTaskAction extends Action {
   type: 'UPDATE_TASK';
@@ -26,9 +29,13 @@ export interface DeleteTaskAction extends Action {
   type: 'DELETE_TASK';
   payload: { uuid: string; sectionId?: string };
 }
-export interface MoveDragTaskAction extends Action {
+export interface MoveTaskAction extends Action {
   type: 'MOVE_TASK';
-  payload: { draggedTaskUuid: string; droppedTaskUuid: string };
+  payload: {
+    draggedTaskUuid: string;
+    droppedTaskUuid: string;
+    direction: MoveDirection;
+  };
 }
 export interface UpdateFocusTaskUuidAction extends Action {
   type: 'UPDATE_FOCUS_TASK_UUID';
@@ -45,9 +52,24 @@ export interface DeleteSectionAction extends Action {
   type: 'DELETE_SECTION';
   payload: { sectionId: string };
 }
-export interface MoveDragSectionAction extends Action {
-  type: 'MOVE_DRAG_SECTION';
-  payload: { draggedSectionId: string; droppedSectionId: string };
+export interface MoveSectionAction extends Action {
+  type: 'MOVE_SECTION';
+  payload: {
+    draggedSectionId: string;
+    droppedSectionId: string;
+    direction: MoveDirection;
+  };
+}
+export interface MoveToSubTaskAction extends Action {
+  type: 'MOVE_TO_SUB_TASK';
+  payload: { parentTaskUuid: string; task: Task };
+}
+export interface PauseAllTaskAction extends Action {
+  type: 'PAUSE_ALL_TASK';
+}
+export interface AddSubTaskAction extends Action {
+  type: 'ADD_SUB_TASK';
+  payload: { uuid: string };
 }
 export type Actions =
   | AddTaskAction
@@ -56,16 +78,20 @@ export type Actions =
   | AddTaskByUuidToSectionAction
   | UpdateTaskAction
   | DeleteTaskAction
-  | MoveDragTaskAction
+  | MoveTaskAction
   | UpdateFocusTaskUuidAction
   | AddSectionAction
   | UpdateSectionTitleAction
   | DeleteSectionAction
-  | MoveDragSectionAction;
+  | MoveSectionAction
+  | MoveToSubTaskAction
+  | PauseAllTaskAction
+  | AddSubTaskAction;
 
 /** Action Creators */
-export const addTask = (): AddTaskAction => ({
-  type: 'ADD_TASK'
+export const addTask = (payload: AddTaskAction['payload']): AddTaskAction => ({
+  type: 'ADD_TASK',
+  payload
 });
 export const addTaskToSection = (
   payload: AddTaskToSectionAction['payload']
@@ -97,9 +123,9 @@ export const deleteTask = (
   type: 'DELETE_TASK',
   payload
 });
-export const moveDragTask = (
-  payload: MoveDragTaskAction['payload']
-): MoveDragTaskAction => ({
+export const moveTask = (
+  payload: MoveTaskAction['payload']
+): MoveTaskAction => ({
   type: 'MOVE_TASK',
   payload
 });
@@ -118,9 +144,21 @@ export const updateSectionTitle = (
 export const deleteSection = (
   payload: DeleteSectionAction['payload']
 ): DeleteSectionAction => ({ type: 'DELETE_SECTION', payload });
-export const moveDragSection = (
-  payload: MoveDragSectionAction['payload']
-): MoveDragSectionAction => ({ type: 'MOVE_DRAG_SECTION', payload });
+export const moveSection = (
+  payload: MoveSectionAction['payload']
+): MoveSectionAction => ({ type: 'MOVE_SECTION', payload });
+export const moveToSubTask = (
+  payload: MoveToSubTaskAction['payload']
+): MoveToSubTaskAction => ({ type: 'MOVE_TO_SUB_TASK', payload });
+export const pauseAllTask = (): PauseAllTaskAction => ({
+  type: 'PAUSE_ALL_TASK'
+});
+export const addSubTask = (
+  payload: AddSubTaskAction['payload']
+): AddSubTaskAction => ({
+  type: 'ADD_SUB_TASK',
+  payload
+});
 export const actionCreator = {
   addTask,
   addTaskToSection,
@@ -128,10 +166,13 @@ export const actionCreator = {
   addTaskByUuidToSection,
   updateTask,
   deleteTask,
-  moveDragTask,
+  moveTask,
   updateFocusTaskUuid,
   addSection,
   updateSectionTitle,
   deleteSection,
-  moveDragSection
+  moveSection,
+  moveToSubTask,
+  pauseAllTask,
+  addSubTask
 };

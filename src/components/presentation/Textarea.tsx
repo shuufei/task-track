@@ -4,6 +4,7 @@ import { jsx, css, SerializedStyles } from '@emotion/core';
 
 import { colors } from 'styles/color';
 import * as typography from 'styles/typography';
+import { useInit } from 'hooks/init';
 
 export const INITIAL_HEIGHT = '27px';
 export const IME_ENTER_KEY_CODE = 229;
@@ -54,9 +55,15 @@ export const Textarea = React.forwardRef<Handler, Props>((props, ref) => {
     innerRef.current.style.height = `${innerRef.current.scrollHeight}px`;
   };
 
+  useInit(() => {
+    if (props.value) {
+      setLocalValue(props.value);
+    }
+  });
+
   useEffect(() => {
     adjustHeight();
-  });
+  }, [props.value]);
 
   const onKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
     switch (event.key as Key) {
@@ -70,7 +77,6 @@ export const Textarea = React.forwardRef<Handler, Props>((props, ref) => {
         if (props.onPressTab == null) {
           return;
         }
-        event.preventDefault();
         props.onPressTab(event);
         break;
       case 'Backspace':
@@ -99,13 +105,14 @@ export const Textarea = React.forwardRef<Handler, Props>((props, ref) => {
   return (
     <textarea
       ref={innerRef}
-      value={props.value ?? localValue}
+      value={localValue}
       onInput={() => adjustHeight()}
-      onChange={event =>
-        props.changeValue != null
-          ? props.changeValue(event.target.value)
-          : setLocalValue(event.target.value)
-      }
+      onChange={event => {
+        setLocalValue(event.target.value);
+        if (props.changeValue != null) {
+          props.changeValue(event.target.value);
+        }
+      }}
       css={css`
         width: 100%;
         border: none;
@@ -124,6 +131,7 @@ export const Textarea = React.forwardRef<Handler, Props>((props, ref) => {
       placeholder={props.placeholder}
       rows={1}
       onKeyDown={event => onKeyDown(event)}
+      spellCheck={false}
     />
   );
 });

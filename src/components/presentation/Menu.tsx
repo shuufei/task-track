@@ -9,6 +9,7 @@ import { MenuPanel } from './MenuPanel';
 export type Props = {
   addComment?: () => void;
   delete?: () => void;
+  addSubTask?: () => void;
   customCss?: SerializedStyles;
 };
 
@@ -24,7 +25,11 @@ export const Menu: React.FC<Props> = props => {
     />
   );
   const menuPanelRender = () => (
-    <MenuPanel addComments={props.addComment} delete={props.delete} />
+    <MenuPanel
+      addComments={props.addComment}
+      delete={props.delete}
+      addSubTask={props.addSubTask}
+    />
   );
   return (
     <PopupContainer

@@ -1,29 +1,47 @@
-import React, { useEffect, useCallback, useContext } from 'react';
+import React, { useEffect, useCallback, useContext, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { SerializedStyles } from '@emotion/core';
+/** @jsx jsx */
+import { jsx, css, SerializedStyles } from '@emotion/core';
 
 import { Task } from 'components/presentation/Task';
 import { RootState, actionCreator } from 'store';
 import { Task as TaskType } from 'model/task';
 import { SectionIdContext } from 'pages/TasksPage';
+import { useTaskDrop, useTaskDrag } from 'hooks/task-drag-and-drop';
+import { colors } from 'styles/color';
 
 export type Props = {
   uuid: string;
+  prevTaskUuid?: string;
   customCss?: SerializedStyles;
 };
 
 export const TaskContainer: React.FC<Props> = props => {
-  const task = useSelector((state: RootState) =>
-    state.task.tasks.find(v => v.uuid === props.uuid)
+  const [isDragging, setIsDragging] = useState(false);
+
+  const taskIndex = useSelector((state: RootState) =>
+    state.task.tasks.findIndex(v => v.uuid === props.uuid)
   );
+  const task = useSelector((state: RootState) => state.task.tasks[taskIndex]);
   const focusUuid = useSelector((state: RootState) => state.task.focusUuid);
   const dispatch = useDispatch();
   const sectionId = useContext(SectionIdContext);
 
+  const isHaveSubtasks = !!(
+    task &&
+    task.subTaskUuids &&
+    task.subTaskUuids.length > 0
+  );
+  const isRootTask = !task?.parentTaskUuid;
+
   const updateTask = useCallback(
     (task: TaskType) => {
       task.updatedAt = new Date();
-      dispatch(actionCreator.task.updateTask({ task }));
+      dispatch(
+        actionCreator.task.updateTask({
+          task
+        })
+      );
     },
     [dispatch]
   );
@@ -50,6 +68,10 @@ export const TaskContainer: React.FC<Props> = props => {
   const updateIsPlaying = (isPlaying: boolean) => {
     if (task == null) {
       return;
+    }
+    if (isPlaying) {
+      // 一度に記録可能なタスクは一つなので、一回全てのタスクを一時停止
+      dispatch(actionCreator.task.pauseAllTask());
     }
     updateTask({
       ...task,
@@ -83,10 +105,16 @@ export const TaskContainer: React.FC<Props> = props => {
       ? dispatch(
           actionCreator.task.addTaskByUuidToSection({
             uuid: props.uuid,
-            sectionId
+            sectionId,
+            parentTaskUuid: task?.parentTaskUuid
           })
         )
-      : dispatch(actionCreator.task.addTaskByUuid({ uuid: props.uuid }));
+      : dispatch(
+          actionCreator.task.addTaskByUuid({
+            uuid: props.uuid,
+            parentTaskUuid: task?.parentTaskUuid
+          })
+        );
   };
   useEffect(() => {
     const interval = setInterval(() => {
@@ -110,41 +138,128 @@ export const TaskContainer: React.FC<Props> = props => {
     };
   }, [task, updateTask]);
   const moveTask = useCallback(
-    (draggedTaskUuid: string) => {
+    (draggedTaskUuid: string, isOverLowerBody: boolean) => {
       if (props.uuid === draggedTaskUuid) {
         return;
       }
+      if (isHaveSubtasks && isOverLowerBody) {
+        // サブタスク持ちでした方向へのドロップの場合は無効にする。
+        // この条件でドロップすると、ドロップされる位置がHover位置と異なるため混乱する。
+        return;
+      }
       dispatch(
-        actionCreator.task.moveDragTask({
+        actionCreator.task.moveTask({
           draggedTaskUuid: draggedTaskUuid,
-          droppedTaskUuid: props.uuid
+          droppedTaskUuid: props.uuid,
+          direction: isOverLowerBody ? 'next' : 'prev'
         })
       );
     },
-    [dispatch, props.uuid]
+    [dispatch, props.uuid, isHaveSubtasks]
   );
+  // const moveToSubTask = () => {
+  //   if (props.prevTaskUuid == null || task == null) {
+  //     return;
+  //   }
+  //   dispatch(
+  //     actionCreator.task.moveToSubTask({
+  //       parentTaskUuid: props.prevTaskUuid,
+  //       task
+  //     })
+  //   );
+  // };
+  const addSubTask = () => {
+    if (task == null) {
+      return;
+    }
+    dispatch(actionCreator.task.addSubTask({ uuid: task.uuid }));
+  };
+
+  const [
+    dropRef,
+    draggedItem,
+    ,
+    isOverUpperBody,
+    isOverLowerBody
+  ] = useTaskDrop(moveTask);
+  const [handleRef, previewRef] = useTaskDrag(props.uuid, setIsDragging);
 
   return (
-    <Task
-      uuid={task?.uuid || ''}
-      title={task?.title || ''}
-      timesec={task?.timesec || 0}
-      isDone={task?.isDone || false}
-      isPlaying={task?.isPlaying || false}
-      comments={task?.comments || []}
-      addSec={(sec, current) => updateTimesec(current + sec)}
-      subtractSec={(sec, current) => updateTimesec(current - sec)}
-      done={isDone => updateIsDone(isDone)}
-      play={() => updateIsPlaying(true)}
-      pause={() => updateIsPlaying(false)}
-      editTitle={value => updateTitle(value)}
-      addComment={() => {}}
-      editComments={comments => updateComments(comments)}
-      delete={() => deleteTask()}
-      onHover={moveTask}
-      addTask={addTask}
-      customCss={props.customCss}
-      focus={focusUuid === props.uuid}
-    />
+    <div
+      css={css`
+        position: relative;
+        opacity: ${isDragging ? 0.4 : 1};
+        padding: ${isRootTask && isHaveSubtasks ? '6px 0' : 0};
+        ${props.customCss};
+      `}
+      ref={previewRef}
+    >
+      <div ref={dropRef}>
+        <Task
+          ref={handleRef}
+          uuid={task?.uuid || ''}
+          title={task?.title || ''}
+          timesec={task?.timesec || 0}
+          isDone={task?.isDone || false}
+          isPlaying={task?.isPlaying || false}
+          comments={task?.comments || []}
+          subTaskUuids={task?.subTaskUuids || []}
+          addSec={(sec, current) => updateTimesec(current + sec)}
+          subtractSec={(sec, current) => updateTimesec(current - sec)}
+          done={isDone => updateIsDone(isDone)}
+          play={() => updateIsPlaying(true)}
+          pause={() => updateIsPlaying(false)}
+          editTitle={value => updateTitle(value)}
+          editComments={comments => updateComments(comments)}
+          delete={() => deleteTask()}
+          addTask={addTask}
+          // moveToSubtask={moveToSubTask}
+          addSubtask={addSubTask}
+          focus={focusUuid === props.uuid}
+        />
+      </div>
+      <div
+        css={css`
+          position: absolute;
+          top: ${isRootTask && isHaveSubtasks ? '0px' : '-4px'};
+          left: 0;
+          height: 1.5px;
+          width: 100%;
+          background-color: ${isOverUpperBody &&
+          draggedItem?.uuid !== props.uuid &&
+          draggedItem?.uuid !== task?.parentTaskUuid
+            ? colors.primary400
+            : colors.transparent};
+        `}
+      ></div>
+      {!isHaveSubtasks && (
+        <div
+          css={css`
+            position: absolute;
+            bottom: ${isRootTask ? '-4px' : '-6px'};
+            left: 0;
+            height: 2.5px;
+            width: 100%;
+            background-color: ${isOverLowerBody &&
+            draggedItem?.uuid !== props.uuid &&
+            draggedItem?.uuid !== task?.parentTaskUuid
+              ? colors.primary400
+              : colors.transparent};
+          `}
+        ></div>
+      )}
+      {task?.subTaskUuids &&
+        task.subTaskUuids.map((uuid, i) => (
+          <TaskContainer
+            uuid={uuid}
+            prevTaskUuid={i !== 0 ? task.subTaskUuids![i - 1] : undefined}
+            key={uuid}
+            customCss={css`
+              margin-top: 6px;
+              margin-left: 24px;
+            `}
+          />
+        ))}
+    </div>
   );
 };
