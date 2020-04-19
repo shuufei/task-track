@@ -242,7 +242,9 @@ const recursiveInvokeFnChildTask = (
   task: Task,
   fn: (child: Task) => void
 ) => {
-  if (!(task.subTaskUuids != null && task.subTaskUuids.length > 0)) {
+  if (
+    !(task != null && task.subTaskUuids != null && task.subTaskUuids.length > 0)
+  ) {
     return;
   }
 
@@ -441,9 +443,24 @@ export const reducer = (state: State = initState, action: Actions) => {
           v => v.sectionId === action.payload.sectionId
         );
 
-        // 親タスクから関連を削除
         const deleteTask = draft.tasks[index];
+        if (deleteTask == null) {
+          return;
+        }
+
+        // 再帰的にsubtaskを削除する
+        recursiveInvokeFnChildTask(draft.tasks, deleteTask, child => {
+          const childTaskIndex = draft.tasks.findIndex(
+            v => v.uuid === child.uuid
+          );
+          if (childTaskIndex === -1) {
+            return;
+          }
+          draft.tasks.splice(childTaskIndex, 1);
+        });
+
         if (deleteTask.parentTaskUuid != null) {
+          // 親タスクから関連を削除
           const [parent, childIndex] = getParentTaskAndChildIndex(
             draft.tasks,
             deleteTask.parentTaskUuid,
@@ -459,6 +476,10 @@ export const reducer = (state: State = initState, action: Actions) => {
               draft.focusUuid = parent.subTaskUuids[childIndex - 1];
             }
           }
+          // 削除されたタスクの親のtimeseを再帰的に更新
+          recursiveInvokeFnParentTask(draft.tasks, deleteTask, parent => {
+            updateParentTimesec(draft.tasks, parent);
+          });
         } else {
           const taskIndexOfSection = sectionTasks.findIndex(
             v => v.uuid === action.payload.uuid && v.parentTaskUuid == null
@@ -603,6 +624,11 @@ export const reducer = (state: State = initState, action: Actions) => {
           }
           draft.tasks.splice(taskIndex, 1);
         });
+
+        // 対象Sectionのタスクを削除
+        draft.tasks = draft.tasks.filter(
+          v => v.sectionId === action.payload.sectionId
+        );
       });
     case 'MOVE_SECTION':
       return produce(state, draft => {
