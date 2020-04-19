@@ -21,6 +21,7 @@ export const TimeField: React.FC<Props> = props => {
       step="1"
       value={time}
       readOnly={true}
+      tabIndex={-1}
       css={css`
         padding: 2px 4px;
         text-align: center;

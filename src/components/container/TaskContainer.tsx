@@ -157,17 +157,17 @@ export const TaskContainer: React.FC<Props> = props => {
     },
     [dispatch, props.uuid, isHaveSubtasks]
   );
-  const moveToSubTask = () => {
-    if (props.prevTaskUuid == null || task == null) {
-      return;
-    }
-    dispatch(
-      actionCreator.task.moveToSubTask({
-        parentTaskUuid: props.prevTaskUuid,
-        task
-      })
-    );
-  };
+  // const moveToSubTask = () => {
+  //   if (props.prevTaskUuid == null || task == null) {
+  //     return;
+  //   }
+  //   dispatch(
+  //     actionCreator.task.moveToSubTask({
+  //       parentTaskUuid: props.prevTaskUuid,
+  //       task
+  //     })
+  //   );
+  // };
   const addSubTask = () => {
     if (task == null) {
       return;
@@ -213,7 +213,7 @@ export const TaskContainer: React.FC<Props> = props => {
           editComments={comments => updateComments(comments)}
           delete={() => deleteTask()}
           addTask={addTask}
-          moveToSubtask={moveToSubTask}
+          // moveToSubtask={moveToSubTask}
           addSubtask={addSubTask}
           focus={focusUuid === props.uuid}
         />

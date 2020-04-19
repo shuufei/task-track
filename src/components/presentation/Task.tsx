@@ -37,7 +37,7 @@ export type Props = {
   editComments: (comments: string[]) => void;
   done: (isDone: boolean) => void;
   addTask: () => void;
-  moveToSubtask: () => void;
+  // moveToSubtask: () => void;
   addSubtask: () => void;
   customCss?: SerializedStyles;
   focus?: boolean;
@@ -83,6 +83,17 @@ export const Task = React.forwardRef<HTMLDivElement, Props>(
         props.editTitle(value);
       });
     };
+
+    // const moveToSubtask = () => {
+    //   // タイトル編集処理が残ってる場合は、終わるのを待ってから処理する
+    //   if (isRemainsEmitEditTitle) {
+    //     setTimeout(() => {
+    //       props.moveToSubtask();
+    //     }, 500);
+    //   } else {
+    //     props.moveToSubtask();
+    //   }
+    // };
 
     // パフォーマンスを考慮し、コメント編集時に毎回props.editCommentを実行しない。
     // 変更イベントから500ms以内に次のイベントが発生しなかった場合に、props.editCommentを実行する。
@@ -171,7 +182,7 @@ export const Task = React.forwardRef<HTMLDivElement, Props>(
             ref={innerRef}
             editTitle={editTitle}
             onPressEnter={props.addTask}
-            onPressTab={props.moveToSubtask}
+            // onPressTab={moveToSubtask}
             onPressDelete={props.delete}
             customCss={css`
               margin-left: 6px;

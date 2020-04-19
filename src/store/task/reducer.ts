@@ -692,7 +692,7 @@ export const reducer = (state: State = initState, action: Actions) => {
           );
         }
 
-        // 親タスクのuuidを保持
+        // 親タスクのuuidを更新
         draft.tasks[movedTaskIndex].parentTaskUuid = parent.uuid;
       });
     case 'PAUSE_ALL_TASK':

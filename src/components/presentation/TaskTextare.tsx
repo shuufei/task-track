@@ -8,7 +8,7 @@ export type Props = {
   title: string;
   editTitle: (comment: string) => void;
   onPressEnter: () => void;
-  onPressTab: () => void;
+  onPressTab?: () => void;
   onPressDelete: () => void;
   customCss?: SerializedStyles;
 };
@@ -22,8 +22,10 @@ export const TaskTextarea = React.forwardRef<Handler, Props>((props, ref) => {
     props.onPressEnter();
   };
   const onPressTab = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    event.preventDefault();
-    props.onPressTab();
+    if (props.onPressTab != null) {
+      event.preventDefault();
+      props.onPressTab();
+    }
   };
   const onPressDelete = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
     const prevValue = (event.target as any).value;

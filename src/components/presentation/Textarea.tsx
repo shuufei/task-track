@@ -77,7 +77,6 @@ export const Textarea = React.forwardRef<Handler, Props>((props, ref) => {
         if (props.onPressTab == null) {
           return;
         }
-        event.preventDefault();
         props.onPressTab(event);
         break;
       case 'Backspace':
