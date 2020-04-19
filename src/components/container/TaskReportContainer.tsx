@@ -22,8 +22,8 @@ export const TaskReportContainer: React.FC<Props> = props => {
     state.task.tasks.find(v => v.uuid === props.uuid)
   );
   const subTasks = useSelector((state: RootState) => {
-    const tasks = state.task.tasks.filter(v =>
-      task?.subTaskUuids?.includes(v.uuid)
+    const tasks = state.task.tasks.filter(
+      v => task?.subTaskUuids?.includes(v.uuid) && v.timesec > 0
     );
     if (props.isSortByTime) {
       tasks.sort((v1, v2) => v2.timesec - v1.timesec);

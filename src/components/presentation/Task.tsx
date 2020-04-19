@@ -28,7 +28,6 @@ export type Props = {
   isPlaying: boolean;
   comments: string[];
   subTaskUuids: string[];
-  addComment: () => void;
   delete: () => void;
   addSec: (sec: number, current: number) => void;
   subtractSec: (sec: number, current: number) => void;
@@ -39,6 +38,7 @@ export type Props = {
   done: (isDone: boolean) => void;
   addTask: () => void;
   moveToSubtask: () => void;
+  addSubtask: () => void;
   customCss?: SerializedStyles;
   focus?: boolean;
 };
@@ -150,7 +150,8 @@ export const Task = React.forwardRef<HTMLDivElement, Props>(
             >
               <Menu
                 addComment={() => addComment(comments.length)}
-                delete={() => props.delete()}
+                addSubTask={props.addSubtask}
+                delete={props.delete}
               />
             </div>
           </AdjustHeightToTextarea>

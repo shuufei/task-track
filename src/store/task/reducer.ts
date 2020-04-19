@@ -675,6 +675,25 @@ export const reducer = (state: State = initState, action: Actions) => {
           v.isPlaying = false;
         });
       });
+    case 'ADD_SUB_TASK':
+      return produce(state, draft => {
+        const taskIndex = draft.tasks.findIndex(
+          v => v.uuid === action.payload.uuid
+        );
+        const task = draft.tasks[taskIndex];
+        if (task == null) {
+          return;
+        }
+        const subTask = {
+          ...generateTask(),
+          parentTaskUuid: task.uuid
+        };
+        draft.tasks.splice(taskIndex, 0, subTask);
+        task.subTaskUuids =
+          task.subTaskUuids != null
+            ? [...task.subTaskUuids, subTask.uuid]
+            : [subTask.uuid];
+      });
     default:
       return state;
   }

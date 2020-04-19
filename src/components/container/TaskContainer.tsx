@@ -168,6 +168,12 @@ export const TaskContainer: React.FC<Props> = props => {
       })
     );
   };
+  const addSubTask = () => {
+    if (task == null) {
+      return;
+    }
+    dispatch(actionCreator.task.addSubTask({ uuid: task.uuid }));
+  };
 
   const [
     dropRef,
@@ -204,11 +210,11 @@ export const TaskContainer: React.FC<Props> = props => {
           play={() => updateIsPlaying(true)}
           pause={() => updateIsPlaying(false)}
           editTitle={value => updateTitle(value)}
-          addComment={() => {}}
           editComments={comments => updateComments(comments)}
           delete={() => deleteTask()}
           addTask={addTask}
           moveToSubtask={moveToSubTask}
+          addSubtask={addSubTask}
           focus={focusUuid === props.uuid}
         />
       </div>
