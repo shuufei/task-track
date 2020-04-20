@@ -63,7 +63,7 @@ export const Textarea = React.forwardRef<Handler, Props>((props, ref) => {
 
   useEffect(() => {
     adjustHeight();
-  }, [props.value]);
+  }, [localValue]);
 
   const onKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
     switch (event.key as Key) {
