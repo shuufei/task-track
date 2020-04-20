@@ -50,9 +50,3 @@ const App: React.FC = () => (
 );
 
 export default App;
-
-const buttonStyle = css`
-  padding: 6px 12px;
-  border-radius: 3px;
-`;
-export const Button: React.FC = () => <button css={buttonStyle}>button</button>;

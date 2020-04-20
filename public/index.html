@@ -43,5 +43,25 @@
       href="https://fonts.googleapis.com/css?family=Lato:300,400,700,900&display=swap"
       rel="stylesheet"
     />
+    <!-- The core Firebase JS SDK is always required and must be listed first -->
+    <script src="https://www.gstatic.com/firebasejs/7.14.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.14.1/firebase-analytics.js"></script>
+
+    <script>
+      // Your web app's Firebase configuration
+      var firebaseConfig = {
+        apiKey: 'AIzaSyBVzCEl7XhP-eNPXO7E86SYPaWTSJOaoqg',
+        authDomain: 'task-track-ddea2.firebaseapp.com',
+        databaseURL: 'https://task-track-ddea2.firebaseio.com',
+        projectId: 'task-track-ddea2',
+        storageBucket: 'task-track-ddea2.appspot.com',
+        messagingSenderId: '878085024934',
+        appId: '1:878085024934:web:9581f38b77767c8a765867',
+        measurementId: 'G-7FZ8FM954D'
+      };
+      // Initialize Firebase
+      firebase.initializeApp(firebaseConfig);
+      firebase.analytics();
+    </script>
   </body>
 </html>
