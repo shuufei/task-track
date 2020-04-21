@@ -10,7 +10,8 @@ export const ICONS = {
   plus: 'icons/plus.svg',
   arrowUp: 'icons/arrow-up.svg',
   arrowDown: 'icons/arrow-down.svg',
-  arrowDownPrimary400: 'icons/arrow-down-primary400.svg'
+  arrowDownPrimary400: 'icons/arrow-down-primary400.svg',
+  archive: 'icons/archive.svg'
 };
 
 export type Props = {

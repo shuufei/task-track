@@ -10,6 +10,7 @@ import { TaskListContainer } from './TaskListContainer';
 import { Menu } from 'components/presentation/Menu';
 import { useDrag, useDrop, DragObjectWithType } from 'react-dnd';
 import { colors } from 'styles/color';
+import { ArchiveSectionContainer } from './ArchiveSectionContainer';
 
 type SectionDropAreaProps = {
   isOver: boolean;
@@ -177,6 +178,14 @@ export const SectionContainer: React.FC<Props> = props => {
             }
           `}
         />
+        {section != null && (
+          <ArchiveSectionContainer
+            sectinId={section.id}
+            customCss={css`
+              margin-left: 8px;
+            `}
+          />
+        )}
       </div>
       <TaskListContainer
         uuids={sectionTaskUuids}
