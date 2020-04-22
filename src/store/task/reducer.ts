@@ -436,14 +436,13 @@ export const reducer = (state: State = initState, action: Actions) => {
       });
     case 'DELETE_TASK':
       return produce(state, draft => {
-        const index = draft.tasks.findIndex(
+        const deleteTask = draft.tasks.find(
           v => v.uuid === action.payload.uuid
         );
         const sectionTasks = draft.tasks.filter(
           v => v.sectionId === action.payload.sectionId
         );
 
-        const deleteTask = draft.tasks[index];
         if (deleteTask == null) {
           return;
         }
@@ -490,8 +489,12 @@ export const reducer = (state: State = initState, action: Actions) => {
           }
         }
 
-        if (index !== -1) {
-          draft.tasks.splice(index, 1);
+        const deleteTaskIndex = draft.tasks.findIndex(
+          v => v.uuid === action.payload.uuid
+        );
+
+        if (deleteTaskIndex !== -1) {
+          draft.tasks.splice(deleteTaskIndex, 1);
         }
       });
     case 'MOVE_TASK':
@@ -711,6 +714,20 @@ export const reducer = (state: State = initState, action: Actions) => {
           task.subTaskUuids != null
             ? [...task.subTaskUuids, subTask.uuid]
             : [subTask.uuid];
+      });
+    case 'IMPORT_SECTIONS':
+      return produce(state, draft => {
+        draft.tasks = [...draft.tasks, ...action.payload.tasks];
+        const importedSectionIndex = draft.sections.findIndex(
+          v => v.id === action.payload.importedSectionId
+        );
+        action.payload.sections.forEach((section, i) => {
+          if (i === 0) {
+            draft.sections.splice(importedSectionIndex, 1, section);
+          } else {
+            draft.sections.splice(importedSectionIndex + 1, 0, section);
+          }
+        });
       });
     default:
       return state;

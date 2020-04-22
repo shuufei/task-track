@@ -1,20 +1,21 @@
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4, v5 as uuidv5 } from 'uuid';
 
 import { Section } from 'model/section';
 import { Task } from 'model/task';
 
-export type CSVHeaderKeys = (
+export type CSVHeaderKey =
   | keyof Task
   | 'section'
   | 'commentsSplitChar'
-  | 'subTaskUUidsSplitChar'
+  | 'subTaskUuidsSplitChar'
   | 'altCommaChar'
-  | 'altNewLineCode'
-)[];
+  | 'altNewLineCode';
+
+export type CSVHeaderKeys = CSVHeaderKey[];
 
 const COMMA = ',';
 const NEW_LINE_CODE = '\n';
-const HEADER_KEYS = [
+const HEADER_KEYS: CSVHeaderKeys = [
   'uuid',
   'title',
   'isDone',
@@ -27,16 +28,17 @@ const HEADER_KEYS = [
   'sectionId',
   'section',
   'subTaskUuids',
-  'subTaskUUidsSplitChar',
+  'subTaskUuidsSplitChar',
   'parentTaskUuid',
   'altCommaChar',
   'altNewLineCode'
-] as CSVHeaderKeys;
+];
 const altCommaIndex = HEADER_KEYS.findIndex(v => v === 'altCommaChar');
 const altNewLineCodeIndex = HEADER_KEYS.findIndex(v => v === 'altNewLineCode');
 
 export const getNotIncludedChar = (rowValues: string[]) => {
-  const SPLIT_CHARS = [':', ';', '<', '>', '/', '%', '&', '+', '¥', '-', '='];
+  // 正規表現の特殊文字が含まれてると面倒い
+  const SPLIT_CHARS = [':', ';', '<', '>', '/', '%', '&', '¥'];
   const c = SPLIT_CHARS.find(char => {
     for (const value of rowValues) {
       if (value.includes(char)) {
@@ -72,12 +74,10 @@ export const convertSectionToCsvFromJson = (
           return section.title;
         }
         if (key === 'commentsSplitChar') {
-          return JSON.stringify(
-            commentsSplitChar || getArraySplitChar(task.comments)
-          );
+          return commentsSplitChar || getArraySplitChar(task.comments);
         }
-        if (key === 'subTaskUUidsSplitChar') {
-          return JSON.stringify(
+        if (key === 'subTaskUuidsSplitChar') {
+          return (
             subTaskUuidsSplitChar || getArraySplitChar(task.subTaskUuids || [])
           );
         }
@@ -113,15 +113,21 @@ export const convertSectionToCsvFromJson = (
   return headerRow + body;
 };
 
-export const convertSectionToJsonFromCsv = (csv: string[]) => {
+const getColumnValue = (key: CSVHeaderKey, rowValues: string[]) => {
+  const index = HEADER_KEYS.findIndex(v => v === key);
+  return rowValues[index];
+};
+
+export const convertSectionToJsonFromCsv = (
+  csv: string[]
+): [Section[], Task[]] => {
   if (csv.length <= 1) {
-    // TODO: 取り込むデータがないメッセージを表示
-    return;
+    throw new NoRecordError();
   }
   try {
-    const headerKeys = csv.shift()!.split(',');
-    const tasks = csv.map(row => {
-      console.log('--- split row: ', row.split(',').length);
+    const uuidv5name = new Date().toISOString();
+    csv.shift(); // header情報を削除
+    const tasks: Task[] = csv.map(row => {
       const rowValues = row.split(COMMA);
       const altCommaChar = rowValues[altCommaIndex];
       const altNewLineCode = rowValues[altNewLineCodeIndex];
@@ -130,12 +136,76 @@ export const convertSectionToJsonFromCsv = (csv: string[]) => {
           .replace(new RegExp(altCommaChar, 'g'), COMMA)
           .replace(new RegExp(altNewLineCode, 'g'), NEW_LINE_CODE)
       );
-      return replacedRowValues;
-      // headerKeys.forEach(key => {});
+      const uuid = getColumnValue('uuid', replacedRowValues);
+      const title = getColumnValue('title', replacedRowValues);
+      const isDone = getColumnValue('isDone', replacedRowValues);
+      const timesec = getColumnValue('timesec', replacedRowValues);
+      const comments = getColumnValue('comments', replacedRowValues);
+      const commentsSplitChar = getColumnValue(
+        'commentsSplitChar',
+        replacedRowValues
+      );
+      const timesecUpdatedTimestamp = getColumnValue(
+        'timesecUpdatedTimestamp',
+        replacedRowValues
+      );
+      const updatedAt = getColumnValue('updatedAt', replacedRowValues);
+      const sectionId = getColumnValue('sectionId', replacedRowValues);
+      const subTaskUuids = getColumnValue('subTaskUuids', replacedRowValues);
+      const subTaskUuidsSplitChar = getColumnValue(
+        'subTaskUuidsSplitChar',
+        replacedRowValues
+      );
+      const parentTaskUuid = getColumnValue(
+        'parentTaskUuid',
+        replacedRowValues
+      );
+      return {
+        uuid: uuidv5(uuidv5name, uuid),
+        title,
+        isDone: isDone === 'true',
+        timesec: !isNaN(Number(timesec)) ? Number(timesec) : 0,
+        isPlaying: false,
+        comments: comments.split(commentsSplitChar),
+        timesecUpdatedTimestamp: !isNaN(Number(timesecUpdatedTimestamp))
+          ? Number(timesecUpdatedTimestamp)
+          : undefined,
+        updatedAt: new Date(updatedAt),
+        sectionId: uuidv5(uuidv5name, sectionId),
+        subTaskUuids: (subTaskUuids !== ''
+          ? subTaskUuids.split(subTaskUuidsSplitChar)
+          : []
+        ).map(v => uuidv5(uuidv5name, v)),
+        parentTaskUuid: parentTaskUuid
+          ? uuidv5(uuidv5name, parentTaskUuid)
+          : undefined
+      };
     });
-    console.log('---tasks: ', tasks);
+    const sections: Section[] = csv
+      .map(row => {
+        const rowValues = row.split(COMMA);
+        const altCommaChar = rowValues[altCommaIndex];
+        const altNewLineCode = rowValues[altNewLineCodeIndex];
+        const replacedRowValues = rowValues.map(v =>
+          v
+            .replace(new RegExp(altCommaChar, 'g'), COMMA)
+            .replace(new RegExp(altNewLineCode, 'g'), NEW_LINE_CODE)
+        );
+        const section = getColumnValue('section', replacedRowValues);
+        const sectionId = getColumnValue('sectionId', replacedRowValues);
+        return {
+          id: uuidv5(uuidv5name, sectionId),
+          title: section
+        };
+      })
+      .filter(
+        (section, i, self) => self.findIndex(v => v.id === section.id) === i
+      );
+    return [sections, tasks];
   } catch (error) {
-    // TODO: フォーマットエラーのメッセージを表示
-    console.error('--- format error');
+    throw new FormatError();
   }
 };
+
+export class FormatError extends Error {}
+export class NoRecordError extends Error {}

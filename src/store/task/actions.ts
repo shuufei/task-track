@@ -71,6 +71,10 @@ export interface AddSubTaskAction extends Action {
   type: 'ADD_SUB_TASK';
   payload: { uuid: string };
 }
+export interface ImportSectionsAction extends Action {
+  type: 'IMPORT_SECTIONS';
+  payload: { sections: Section[]; tasks: Task[]; importedSectionId: string };
+}
 export type Actions =
   | AddTaskAction
   | AddTaskToSectionAction
@@ -86,7 +90,8 @@ export type Actions =
   | MoveSectionAction
   | MoveToSubTaskAction
   | PauseAllTaskAction
-  | AddSubTaskAction;
+  | AddSubTaskAction
+  | ImportSectionsAction;
 
 /** Action Creators */
 export const addTask = (payload: AddTaskAction['payload']): AddTaskAction => ({
@@ -159,6 +164,12 @@ export const addSubTask = (
   type: 'ADD_SUB_TASK',
   payload
 });
+export const importSections = (
+  payload: ImportSectionsAction['payload']
+): ImportSectionsAction => ({
+  type: 'IMPORT_SECTIONS',
+  payload
+});
 export const actionCreator = {
   addTask,
   addTaskToSection,
@@ -174,5 +185,6 @@ export const actionCreator = {
   moveSection,
   moveToSubTask,
   pauseAllTask,
-  addSubTask
+  addSubTask,
+  importSections
 };
