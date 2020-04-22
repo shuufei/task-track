@@ -73,7 +73,7 @@ export interface AddSubTaskAction extends Action {
 }
 export interface ImportSectionsAction extends Action {
   type: 'IMPORT_SECTIONS';
-  payload: { sections: Section[]; tasks: Task[]; importedSectionId: string };
+  payload: { sections: Section[]; tasks: Task[] };
 }
 export type Actions =
   | AddTaskAction

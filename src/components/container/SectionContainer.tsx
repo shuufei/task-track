@@ -188,15 +188,6 @@ export const SectionContainer: React.FC<Props> = props => {
           />
         )}
       </div>
-      {sectionTaskUuids.length === 0 && (
-        <ImportArchiveSectionContainer
-          sectionId={props.sectionId}
-          customCss={css`
-            margin-top: 8px;
-            margin-left: 6px;
-          `}
-        />
-      )}
       <TaskListContainer
         uuids={sectionTaskUuids}
         customCss={css`

@@ -718,16 +718,7 @@ export const reducer = (state: State = initState, action: Actions) => {
     case 'IMPORT_SECTIONS':
       return produce(state, draft => {
         draft.tasks = [...draft.tasks, ...action.payload.tasks];
-        const importedSectionIndex = draft.sections.findIndex(
-          v => v.id === action.payload.importedSectionId
-        );
-        action.payload.sections.forEach((section, i) => {
-          if (i === 0) {
-            draft.sections.splice(importedSectionIndex, 1, section);
-          } else {
-            draft.sections.splice(importedSectionIndex + 1, 0, section);
-          }
-        });
+        draft.sections = [...draft.sections, ...action.payload.sections];
       });
     default:
       return state;

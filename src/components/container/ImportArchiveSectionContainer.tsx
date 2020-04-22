@@ -14,7 +14,6 @@ import { actionCreator } from 'store/task';
 import { colors } from 'styles/color';
 
 export type Props = {
-  sectionId: string;
   customCss?: SerializedStyles;
 };
 
@@ -28,8 +27,7 @@ export const ImportArchiveSectionContainer: React.FC<Props> = props => {
       dispatch(
         actionCreator.importSections({
           sections,
-          tasks,
-          importedSectionId: props.sectionId
+          tasks
         })
       );
       setErrorMessage(null);
@@ -78,29 +76,37 @@ export const ImportArchiveSectionContainer: React.FC<Props> = props => {
           visibility: hidden;
         `}
       />
-      {errorMessage && (
-        <p
-          css={css`
-            ${typography.base};
-            color: ${colors.red500};
-            margin: 0;
-            margin-bottom: 8px;
-          `}
-        >
-          {errorMessage}
-        </p>
-      )}
-      <span
+      <button
         css={css`
-          ${typography.base};
-          color: ${colors.black350};
+          padding: 6px 12px;
+          outline: none;
+          border: none;
+          border-radius: 3px;
+          background-color: ${colors.black400};
           cursor: pointer;
-          text-decoration: underline;
+          ${typography.caption};
+          color: ${colors.white};
+          font-weight: ${typography.weight.bold};
+          :hover {
+            filter: brightness(0.8);
+          }
         `}
         onClick={() => ref.current?.click()}
       >
         Import Section
-      </span>
+      </button>
+      {errorMessage && (
+        <span
+          css={css`
+            ${typography.base};
+            color: ${colors.red500};
+            margin: 0;
+            margin-left: 8px;
+          `}
+        >
+          {errorMessage}
+        </span>
+      )}
     </div>
   );
 };

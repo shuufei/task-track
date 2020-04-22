@@ -10,6 +10,7 @@ import { SectionContainer } from 'components/container/SectionContainer';
 import * as typography from 'styles/typography';
 import { colors } from 'styles/color';
 import { useInit } from 'hooks/init';
+import { ImportArchiveSectionContainer } from 'components/container/ImportArchiveSectionContainer';
 
 export const SectionIdContext = React.createContext<string | undefined>(
   undefined
@@ -67,6 +68,12 @@ export const TasksPage: React.FC = () => {
       >
         Add Section
       </button>
+      <ImportArchiveSectionContainer
+        customCss={css`
+          display: inline-block;
+          margin-left: 8px;
+        `}
+      />
     </div>
   );
 };
