@@ -11,7 +11,6 @@ import { Menu } from 'components/presentation/Menu';
 import { useDrag, useDrop, DragObjectWithType } from 'react-dnd';
 import { colors } from 'styles/color';
 import { ArchiveSectionContainer } from './ArchiveSectionContainer';
-import { ImportArchiveSectionContainer } from './ImportArchiveSectionContainer';
 
 type SectionDropAreaProps = {
   isOver: boolean;
