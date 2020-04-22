@@ -553,6 +553,9 @@ export const reducer = (state: State = initState, action: Actions) => {
             droppedTask,
             action.payload.direction
           );
+          recursiveInvokeFnParentTask(draft.tasks, draggedTask, parent => {
+            updateParentTimesec(draft.tasks, parent);
+          });
         } else if (
           // ドロップ先のタスクがサブタスクの場合
           droppedTask.parentTaskUuid != null &&
@@ -689,6 +692,14 @@ export const reducer = (state: State = initState, action: Actions) => {
 
         // 親タスクのuuidを更新
         draft.tasks[movedTaskIndex].parentTaskUuid = parent.uuid;
+
+        recursiveInvokeFnParentTask(
+          draft.tasks,
+          draft.tasks[movedTaskIndex],
+          parent => {
+            updateParentTimesec(draft.tasks, parent);
+          }
+        );
       });
     case 'PAUSE_ALL_TASK':
       return produce(state, draft => {
