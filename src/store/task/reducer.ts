@@ -707,7 +707,8 @@ export const reducer = (state: State = initState, action: Actions) => {
         }
         const subTask = {
           ...generateTask(),
-          parentTaskUuid: task.uuid
+          parentTaskUuid: task.uuid,
+          sectionId: task.sectionId
         };
         draft.tasks.splice(taskIndex, 0, subTask);
         task.subTaskUuids =
