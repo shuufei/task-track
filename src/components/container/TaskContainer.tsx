@@ -252,7 +252,7 @@ export const TaskContainer: React.FC<Props> = props => {
             bottom: ${isRootTask ? '-4px' : '-6px'};
             left: 0;
             height: 2.5px;
-            width: 100%;
+            width: calc(100% - 24px);
             margin-left: ${isOverSubTaskArea ? '24px;' : ''};
             background-color: ${isOverLowerBody &&
             draggedItem?.uuid !== props.uuid &&

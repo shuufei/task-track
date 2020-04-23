@@ -17,12 +17,13 @@ export const TimeField: React.FC<Props> = props => {
   const time = convertToTimeFormatFromSec(props.timesec);
   return (
     <input
-      type="time"
-      step="1"
+      type="text"
       value={time}
       readOnly={true}
       tabIndex={-1}
       css={css`
+        display: inline-block;
+        width: 55px;
         padding: 2px 4px;
         text-align: center;
         background-color: ${colors.black80};
