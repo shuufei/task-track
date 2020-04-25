@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 /** @jsx jsx */
 import { jsx, css, keyframes } from '@emotion/core';
@@ -22,27 +22,30 @@ export const UndoContainer: React.FC = () => {
     undoState.task != null ||
     undoState.comment != null;
 
+  const setUndoTimeout = useCallback(() => {
+    if (timeoutProcess != null) {
+      clearTimeout(timeoutProcess);
+    }
+    setTimeoutProcess(
+      setTimeout(() => {
+        dispatch(actionCreator.undoClear());
+      }, 5000)
+    );
+  }, [setTimeoutProcess, dispatch]);
+
   useEffect(() => {
     if (existUndoState) {
       if (!invokedFirstUndo) {
         setInvokedFirstUndo(true);
       }
-      if (timeoutProcess != null) {
-        clearTimeout(timeoutProcess);
-      }
-      setTimeoutProcess(
-        setTimeout(() => {
-          dispatch(actionCreator.undoClear());
-        }, 5000)
-      );
+      setUndoTimeout();
     }
   }, [
-    undoState,
-    dispatch,
     invokedFirstUndo,
     setInvokedFirstUndo,
     existUndoState,
-    timeoutProcess
+    setUndoTimeout
+    // timeoutProcess
   ]);
   return (
     <button
