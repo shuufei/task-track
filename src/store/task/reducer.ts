@@ -732,6 +732,107 @@ export const reducer = (state: State = initState, action: Actions) => {
         draft.tasks = [...draft.tasks, ...action.payload.tasks];
         draft.sections = [...draft.sections, ...action.payload.sections];
       });
+    case 'SET_SECTION_UNDO_STATE':
+      return produce(state, draft => {
+        draft.undoState = {};
+        const sectionIndex = draft.sections.findIndex(
+          v => v.id === action.payload.sectionId
+        );
+        if (sectionIndex === -1) {
+          return;
+        }
+        const section = draft.sections[sectionIndex];
+        const tasks = draft.tasks.filter(
+          v => v.sectionId === action.payload.sectionId
+        );
+        draft.undoState.section = {
+          section,
+          tasks,
+          insertIndex: sectionIndex
+        };
+      });
+    case 'SET_TASK_UNDO_STATE':
+      return produce(state, draft => {
+        draft.undoState = {};
+        const taskIndex = draft.tasks.findIndex(
+          v => v.uuid === action.payload.uuid
+        );
+        const task = draft.tasks[taskIndex];
+        if (task == null) {
+          return;
+        }
+        const subTasks: Task[] = [];
+        recursiveInvokeFnChildTask(draft.tasks, task, child => {
+          subTasks.push(child);
+        });
+        let insertIndexForSubTask: number | undefined;
+        if (task.parentTaskUuid != null) {
+          const [, childIndex] = getParentTaskAndChildIndex(
+            draft.tasks,
+            task.parentTaskUuid,
+            task.uuid
+          );
+          insertIndexForSubTask = childIndex;
+        }
+        draft.undoState.task = {
+          task,
+          subTasks,
+          insertIndex: taskIndex,
+          insertIndexForSubTask
+        };
+      });
+    case 'SET_COMMENT_UNDO_STATE':
+      return produce(state, draft => {
+        draft.undoState = {};
+        draft.undoState.comment = {
+          taskUuid: action.payload.taskUuid,
+          comments: action.payload.comments
+        };
+      });
+    case 'UNDO':
+      return produce(state, draft => {
+        const undoState = draft.undoState;
+        if (undoState.section != null) {
+          draft.tasks = [...draft.tasks, ...undoState.section.tasks];
+          draft.sections.splice(
+            undoState.section.insertIndex,
+            0,
+            undoState.section.section
+          );
+        }
+        if (undoState.task != null) {
+          draft.tasks.splice(
+            undoState.task.insertIndex,
+            0,
+            undoState.task.task
+          );
+          draft.tasks = [...draft.tasks, ...undoState.task.subTasks];
+          if (undoState.task.insertIndexForSubTask != null) {
+            const parent = draft.tasks.find(
+              v => v.uuid === undoState.task!.task.parentTaskUuid
+            );
+            parent?.subTaskUuids?.splice(
+              undoState.task.insertIndexForSubTask,
+              0,
+              undoState.task.task.uuid
+            );
+          }
+        }
+        if (undoState.comment != null) {
+          const task = draft.tasks.find(
+            v => v.uuid === undoState.comment!.taskUuid
+          );
+          if (task == null) {
+            return;
+          }
+          task.comments = undoState.comment.comments;
+        }
+        draft.undoState = {};
+      });
+    case 'UNDO_CLEAR':
+      return produce(state, draft => {
+        draft.undoState = {};
+      });
     default:
       return state;
   }

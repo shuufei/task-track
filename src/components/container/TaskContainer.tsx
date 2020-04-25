@@ -92,12 +92,21 @@ export const TaskContainer: React.FC<Props> = props => {
     if (task == null) {
       return;
     }
+    if (comments.length < task.comments.length) {
+      dispatch(
+        actionCreator.task.setCommentUndoState({
+          taskUuid: task.uuid,
+          comments: task.comments
+        })
+      );
+    }
     updateTask({
       ...task,
       comments
     });
   };
   const deleteTask = () => {
+    dispatch(actionCreator.task.setTaskUndoState({ uuid: props.uuid }));
     dispatch(actionCreator.task.deleteTask({ uuid: props.uuid, sectionId }));
   };
   const addTask = () => {

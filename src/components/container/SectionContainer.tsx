@@ -115,6 +115,17 @@ export const SectionContainer: React.FC<Props> = props => {
   connectDropNextSection(dropNextSectionRef);
   connectDropPrevSection(dropPrevSectionRef);
 
+  const deleteSection = () => {
+    dispatch(
+      actionCreator.task.setSectionUndoState({ sectionId: props.sectionId })
+    );
+    dispatch(
+      actionCreator.task.deleteSection({
+        sectionId: props.sectionId
+      })
+    );
+  };
+
   return (
     <div
       ref={previewRef}
@@ -147,15 +158,7 @@ export const SectionContainer: React.FC<Props> = props => {
             visibility: ${isHoverSectionTitle ? 'visible' : 'hidden'};
           `}
         >
-          <Menu
-            delete={() =>
-              dispatch(
-                actionCreator.task.deleteSection({
-                  sectionId: props.sectionId
-                })
-              )
-            }
-          />
+          <Menu delete={() => deleteSection()} />
         </div>
         <Textarea
           value={section?.title || ''}

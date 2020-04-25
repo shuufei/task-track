@@ -13,7 +13,6 @@ import { AdjustHeightToTextarea, Handler } from './Textarea';
 import { Comment } from './Comment';
 import { TaskTextarea } from './TaskTextare';
 import { useDebounce } from 'hooks/debounce';
-import { useInit } from 'hooks/init';
 
 type Comment = {
   id: string;
@@ -37,7 +36,6 @@ export type Props = {
   editComments: (comments: string[]) => void;
   done: (isDone: boolean) => void;
   addTask: () => void;
-  // moveToSubtask: () => void;
   addSubtask: () => void;
   customCss?: SerializedStyles;
   focus?: boolean;
@@ -53,10 +51,6 @@ export const Task = React.forwardRef<HTMLDivElement, Props>(
     const [comments, setComments] = useState<Comment[]>([]);
     const innerRef = useRef<Handler>(null);
 
-    useInit(() => {
-      setComments(props.comments.map(v => ({ id: uuidv4(), text: v })));
-    });
-
     useEffect(() => {
       if (props.focus != null && props.focus !== beforeFocus) {
         setBeforeFocus(props.focus);
@@ -64,7 +58,10 @@ export const Task = React.forwardRef<HTMLDivElement, Props>(
           innerRef.current.focus();
         }
       }
-    }, [beforeFocus, props.focus, props.comments]);
+      if (comments.length !== props.comments.length) {
+        setComments(props.comments.map(v => ({ id: uuidv4(), text: v })));
+      }
+    }, [beforeFocus, props.focus, props.comments, comments.length]);
 
     const focusPrevComment = (currentIndex: number) => {
       setFocusCommentIndex(currentIndex === 0 ? 0 : currentIndex - 1);
@@ -83,17 +80,6 @@ export const Task = React.forwardRef<HTMLDivElement, Props>(
         props.editTitle(value);
       });
     };
-
-    // const moveToSubtask = () => {
-    //   // タイトル編集処理が残ってる場合は、終わるのを待ってから処理する
-    //   if (isRemainsEmitEditTitle) {
-    //     setTimeout(() => {
-    //       props.moveToSubtask();
-    //     }, 500);
-    //   } else {
-    //     props.moveToSubtask();
-    //   }
-    // };
 
     // パフォーマンスを考慮し、コメント編集時に毎回props.editCommentを実行しない。
     // 変更イベントから500ms以内に次のイベントが発生しなかった場合に、props.editCommentを実行する。
@@ -182,7 +168,6 @@ export const Task = React.forwardRef<HTMLDivElement, Props>(
             ref={innerRef}
             editTitle={editTitle}
             onPressEnter={props.addTask}
-            // onPressTab={moveToSubtask}
             onPressDelete={props.delete}
             customCss={css`
               margin-left: 6px;
@@ -198,10 +183,8 @@ export const Task = React.forwardRef<HTMLDivElement, Props>(
             <TimeControl
               timesec={props.timesec}
               isPlaying={props.isPlaying}
-              addSec={(sec, currentSec) => props.addSec(sec, currentSec)}
-              subtractSec={(sec, currentSec) =>
-                props.subtractSec(sec, currentSec)
-              }
+              addSec={(sec, _) => props.addSec(sec, props.timesec)}
+              subtractSec={(sec, _) => props.subtractSec(sec, props.timesec)}
               readonly={props.subTaskUuids.length > 0}
             />
           </AdjustHeightToTextarea>

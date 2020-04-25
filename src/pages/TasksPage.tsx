@@ -11,6 +11,7 @@ import * as typography from 'styles/typography';
 import { colors } from 'styles/color';
 import { useInit } from 'hooks/init';
 import { ImportArchiveSectionContainer } from 'components/container/ImportArchiveSectionContainer';
+import { UndoContainer } from 'components/container/UndoContainer';
 
 export const SectionIdContext = React.createContext<string | undefined>(
   undefined
@@ -35,6 +36,7 @@ export const TasksPage: React.FC = () => {
         padding: 0 24px 24px;
       `}
     >
+      <UndoContainer />
       <DndProvider backend={Backend}>
         {sectionIds.map((v, i) => (
           <SectionIdContext.Provider value={v} key={v}>

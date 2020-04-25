@@ -75,6 +75,24 @@ export interface ImportSectionsAction extends Action {
   type: 'IMPORT_SECTIONS';
   payload: { sections: Section[]; tasks: Task[] };
 }
+export interface SetTaskUndoStateAction extends Action {
+  type: 'SET_TASK_UNDO_STATE';
+  payload: { uuid: string };
+}
+export interface SetSectionUndoStateAction extends Action {
+  type: 'SET_SECTION_UNDO_STATE';
+  payload: { sectionId: string };
+}
+export interface SetCommentUndoStateAction extends Action {
+  type: 'SET_COMMENT_UNDO_STATE';
+  payload: { taskUuid: string; comments: string[] };
+}
+export interface UndoAction extends Action {
+  type: 'UNDO';
+}
+export interface UndoClearAction extends Action {
+  type: 'UNDO_CLEAR';
+}
 export type Actions =
   | AddTaskAction
   | AddTaskToSectionAction
@@ -91,7 +109,12 @@ export type Actions =
   | MoveToSubTaskAction
   | PauseAllTaskAction
   | AddSubTaskAction
-  | ImportSectionsAction;
+  | ImportSectionsAction
+  | SetTaskUndoStateAction
+  | SetSectionUndoStateAction
+  | SetCommentUndoStateAction
+  | UndoAction
+  | UndoClearAction;
 
 /** Action Creators */
 export const addTask = (payload: AddTaskAction['payload']): AddTaskAction => ({
@@ -170,6 +193,30 @@ export const importSections = (
   type: 'IMPORT_SECTIONS',
   payload
 });
+export const setTaskUndoState = (
+  payload: SetTaskUndoStateAction['payload']
+): SetTaskUndoStateAction => ({
+  type: 'SET_TASK_UNDO_STATE',
+  payload
+});
+export const setSectionUndoState = (
+  payload: SetSectionUndoStateAction['payload']
+): SetSectionUndoStateAction => ({
+  type: 'SET_SECTION_UNDO_STATE',
+  payload
+});
+export const setCommentUndoState = (
+  payload: SetCommentUndoStateAction['payload']
+): SetCommentUndoStateAction => ({
+  type: 'SET_COMMENT_UNDO_STATE',
+  payload
+});
+export const undo = (): UndoAction => ({
+  type: 'UNDO'
+});
+export const undoClear = (): UndoClearAction => ({
+  type: 'UNDO_CLEAR'
+});
 export const actionCreator = {
   addTask,
   addTaskToSection,
@@ -186,5 +233,10 @@ export const actionCreator = {
   moveToSubTask,
   pauseAllTask,
   addSubTask,
-  importSections
+  importSections,
+  setTaskUndoState,
+  setSectionUndoState,
+  setCommentUndoState,
+  undo,
+  undoClear
 };
