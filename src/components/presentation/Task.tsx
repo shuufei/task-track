@@ -51,18 +51,6 @@ export const Task = React.forwardRef<HTMLDivElement, Props>(
     const [comments, setComments] = useState<Comment[]>([]);
     const innerRef = useRef<Handler>(null);
 
-    useEffect(() => {
-      if (props.focus != null && props.focus !== beforeFocus) {
-        setBeforeFocus(props.focus);
-        if (props.focus && innerRef.current != null) {
-          innerRef.current.focus();
-        }
-      }
-      if (comments.length !== props.comments.length) {
-        setComments(props.comments.map(v => ({ id: uuidv4(), text: v })));
-      }
-    }, [beforeFocus, props.focus, props.comments, comments.length]);
-
     const focusPrevComment = (currentIndex: number) => {
       setFocusCommentIndex(currentIndex === 0 ? 0 : currentIndex - 1);
     };
@@ -83,7 +71,7 @@ export const Task = React.forwardRef<HTMLDivElement, Props>(
 
     // パフォーマンスを考慮し、コメント編集時に毎回props.editCommentを実行しない。
     // 変更イベントから500ms以内に次のイベントが発生しなかった場合に、props.editCommentを実行する。
-    const [invokeEmitEditComments] = useDebounce(500);
+    const [invokeEmitEditComments, remainingProcess] = useDebounce(500);
     const editComment = (comment: string, index: number) => {
       const tmpComments = [...comments];
       tmpComments[index].text = comment;
@@ -111,6 +99,19 @@ export const Task = React.forwardRef<HTMLDivElement, Props>(
         props.editComments(tmpComments.map(v => v.text));
       });
     };
+
+    useEffect(() => {
+      if (props.focus != null && props.focus !== beforeFocus) {
+        setBeforeFocus(props.focus);
+        if (props.focus && innerRef.current != null) {
+          innerRef.current.focus();
+        }
+      }
+
+      if (comments.length < props.comments.length && !remainingProcess) {
+        setComments(props.comments.map(v => ({ id: uuidv4(), text: v })));
+      }
+    }, [beforeFocus, props.focus, props.comments, comments.length]);
 
     return (
       <div
