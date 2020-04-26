@@ -190,8 +190,8 @@ export const Task = React.forwardRef<HTMLDivElement, Props>(
             <TimeControl
               timesec={props.timesec}
               isPlaying={props.isPlaying}
-              addSec={(sec, _) => props.addSec(sec, props.timesec)}
-              subtractSec={(sec, _) => props.subtractSec(sec, props.timesec)}
+              addSec={(sec, current) => props.addSec(sec, current)}
+              subtractSec={(sec, current) => props.subtractSec(sec, current)}
               readonly={props.subTaskUuids.length > 0}
             />
           </AdjustHeightToTextarea>

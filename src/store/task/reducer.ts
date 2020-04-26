@@ -260,14 +260,14 @@ const recursiveInvokeFnChildTask = (
 };
 
 const updateParentTimesec = (tasks: Task[], parent: Task) => {
-  const timesec = parent.subTaskUuids!.reduce((acc, curr) => {
+  const subSubTasksTimesec = parent.subTaskUuids!.reduce((acc, curr) => {
     const task = tasks.find(v => v.uuid === curr);
     if (task == null) {
       return acc;
     }
-    return acc + task.timesec;
+    return acc + (task.timesec || 0);
   }, 0);
-  parent.timesec = timesec;
+  parent.sumSubTasksTimesec = subSubTasksTimesec;
 };
 
 export const reducer = (state: State = initState, action: Actions) => {

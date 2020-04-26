@@ -5,6 +5,7 @@ export type Task = {
   title: string;
   isDone: boolean;
   timesec: number;
+  sumSubTasksTimesec?: number;
   isPlaying: boolean;
   comments: string[];
   timesecUpdatedTimestamp?: number;

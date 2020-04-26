@@ -130,7 +130,11 @@ export const TaskContainer: React.FC<Props> = props => {
       if (task == null) {
         return;
       }
-      if (!task.isPlaying || task.timesecUpdatedTimestamp == null) {
+      if (
+        !task.isPlaying ||
+        task.timesecUpdatedTimestamp == null ||
+        (task.subTaskUuids != null && task.subTaskUuids.length > 0)
+      ) {
         return;
       }
       const diffSec =
@@ -178,17 +182,6 @@ export const TaskContainer: React.FC<Props> = props => {
     },
     [dispatch, props.uuid, isHaveSubtasks]
   );
-  // const moveToSubTask = () => {
-  //   if (props.prevTaskUuid == null || task == null) {
-  //     return;
-  //   }
-  //   dispatch(
-  //     actionCreator.task.moveToSubTask({
-  //       parentTaskUuid: props.prevTaskUuid,
-  //       task
-  //     })
-  //   );
-  // };
   const addSubTask = () => {
     if (task == null) {
       return;
@@ -221,7 +214,7 @@ export const TaskContainer: React.FC<Props> = props => {
           ref={handleRef}
           uuid={task?.uuid || ''}
           title={task?.title || ''}
-          timesec={task?.timesec || 0}
+          timesec={task?.timesec + (task.sumSubTasksTimesec || 0) || 0}
           isDone={task?.isDone || false}
           isPlaying={task?.isPlaying || false}
           comments={task?.comments || []}
@@ -235,7 +228,6 @@ export const TaskContainer: React.FC<Props> = props => {
           editComments={comments => updateComments(comments)}
           delete={() => deleteTask()}
           addTask={addTask}
-          // moveToSubtask={moveToSubTask}
           addSubtask={addSubTask}
           focus={focusUuid === props.uuid}
         />
