@@ -54,11 +54,11 @@ export const useTaskDrop = (
   const [{ draggedItem, isOver }, connectDrop] = useDrop({
     accept: DRAG_TYPE_TASK,
     drop: (v: DragObjectType) => {
-      dropCallback(v.uuid, isOverLowerBody, isOverSubTaskArea);
-      setIsOverUpperBody(false);
-      setIsOverLowerBody(false);
+      // dropCallback(v.uuid, isOverLowerBody, isOverSubTaskArea);
+      // setIsOverUpperBody(false);
+      // setIsOverLowerBody(false);
     },
-    hover: (_, monitor) => {
+    hover: (v: DragObjectType, monitor) => {
       if (dropRef.current == null) {
         return;
       }
@@ -71,9 +71,12 @@ export const useTaskDrop = (
       }
       const hoverClientY = clientOffset.y - hoverBoundingRect.top;
       const hoverClientX = clientOffset.x - hoverBoundingRect.left;
-      setIsOverUpperBody(hoverClientY < hoverMiddleY);
-      setIsOverLowerBody(hoverClientY > hoverMiddleY);
-      setIsOverSubTaskArea(hoverClientX > 24);
+      // setIsOverUpperBody(hoverClientY < hoverMiddleY);
+      // setIsOverLowerBody(hoverClientY > hoverMiddleY);
+      // setIsOverSubTaskArea(hoverClientX > 24);
+      dropCallback(v.uuid, hoverClientY > hoverMiddleY, hoverClientX > 24);
+      // setIsOverUpperBody(false);
+      // setIsOverLowerBody(false);
     },
     collect: monitor => {
       return {

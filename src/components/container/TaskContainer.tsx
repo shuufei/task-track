@@ -9,6 +9,7 @@ import { Task as TaskType } from 'model/task';
 import { SectionIdContext } from 'pages/TasksPage';
 import { useTaskDrop, useTaskDrag } from 'hooks/task-drag-and-drop';
 import { colors } from 'styles/color';
+import { useDebounce } from 'hooks/debounce';
 
 export type Props = {
   uuid: string;
@@ -146,12 +147,15 @@ export const TaskContainer: React.FC<Props> = props => {
       clearInterval(interval);
     };
   }, [task, updateTask]);
+  const [invokeMoveTask] = useDebounce(500);
   const moveTask = useCallback(
     (
       draggedTaskUuid: string,
       isOverLowerBody: boolean,
       isOverSubTaskArea: boolean
     ) => {
+      console.log('--- task: ', props.uuid, draggedTaskUuid);
+
       if (props.uuid === draggedTaskUuid) {
         return;
       }
@@ -160,35 +164,42 @@ export const TaskContainer: React.FC<Props> = props => {
         // この条件でドロップすると、ドロップされる位置がHover位置と異なるため混乱する。
         return;
       }
-      dispatch(
-        actionCreator.task.moveTask({
-          draggedTaskUuid: draggedTaskUuid,
-          droppedTaskUuid: props.uuid,
-          direction: isOverLowerBody ? 'next' : 'prev'
-        })
-      );
-      if (isOverLowerBody && isOverSubTaskArea) {
+      invokeMoveTask(() => {
+        console.log('--- invoke movetask: ');
         dispatch(
-          actionCreator.task.moveToSubTask({
-            parentTaskUuid: props.uuid,
-            taskUuid: draggedTaskUuid
+          actionCreator.task.moveTask({
+            draggedTaskUuid: draggedTaskUuid,
+            droppedTaskUuid: props.uuid,
+            direction: isOverLowerBody ? 'next' : 'prev'
           })
         );
-      }
+        if (isOverLowerBody && isOverSubTaskArea) {
+          dispatch(
+            actionCreator.task.moveToSubTask({
+              parentTaskUuid: props.uuid,
+              taskUuid: draggedTaskUuid
+            })
+          );
+        }
+      });
+      // dispatch(
+      //   actionCreator.task.moveTask({
+      //     draggedTaskUuid: draggedTaskUuid,
+      //     droppedTaskUuid: props.uuid,
+      //     direction: isOverLowerBody ? 'next' : 'prev'
+      //   })
+      // );
+      // if (isOverLowerBody && isOverSubTaskArea) {
+      //   dispatch(
+      //     actionCreator.task.moveToSubTask({
+      //       parentTaskUuid: props.uuid,
+      //       taskUuid: draggedTaskUuid
+      //     })
+      //   );
+      // }
     },
     [dispatch, props.uuid, isHaveSubtasks]
   );
-  // const moveToSubTask = () => {
-  //   if (props.prevTaskUuid == null || task == null) {
-  //     return;
-  //   }
-  //   dispatch(
-  //     actionCreator.task.moveToSubTask({
-  //       parentTaskUuid: props.prevTaskUuid,
-  //       task
-  //     })
-  //   );
-  // };
   const addSubTask = () => {
     if (task == null) {
       return;
@@ -235,7 +246,6 @@ export const TaskContainer: React.FC<Props> = props => {
           editComments={comments => updateComments(comments)}
           delete={() => deleteTask()}
           addTask={addTask}
-          // moveToSubtask={moveToSubTask}
           addSubtask={addSubTask}
           focus={focusUuid === props.uuid}
         />

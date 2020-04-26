@@ -25,6 +25,15 @@ export const TaskListContainer: React.FC<Props> = props => {
   const taskDropRef = useRef<HTMLDivElement>(null);
   const [{ isOver }, connectTaskDrop] = useDrop({
     accept: DRAG_TYPE_TASK,
+    // hover: (v: DragObjectType) => {
+    //   dispatch(
+    //     actionCreator.task.moveTask({
+    //       draggedTaskUuid: v.uuid,
+    //       droppedTaskUuid: lastUuid,
+    //       direction: 'next'
+    //     })
+    //   );
+    // },
     drop: (v: DragObjectType) => {
       dispatch(
         actionCreator.task.moveTask({
