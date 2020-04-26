@@ -22,16 +22,20 @@ export const UndoContainer: React.FC = () => {
     undoState.task != null ||
     undoState.comment != null;
 
-  const setUndoTimeout = useCallback(() => {
-    if (timeoutProcess != null) {
-      clearTimeout(timeoutProcess);
-    }
-    setTimeoutProcess(
-      setTimeout(() => {
-        dispatch(actionCreator.undoClear());
-      }, 5000)
-    );
-  }, [setTimeoutProcess, dispatch]);
+  const setUndoTimeout = useCallback(
+    () => {
+      if (timeoutProcess != null) {
+        clearTimeout(timeoutProcess);
+      }
+      setTimeoutProcess(
+        setTimeout(() => {
+          dispatch(actionCreator.undoClear());
+        }, 5000)
+      );
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [setTimeoutProcess, dispatch]
+  );
 
   useEffect(() => {
     if (existUndoState) {

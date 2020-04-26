@@ -111,7 +111,13 @@ export const Task = React.forwardRef<HTMLDivElement, Props>(
       if (comments.length < props.comments.length && !remainingProcess) {
         setComments(props.comments.map(v => ({ id: uuidv4(), text: v })));
       }
-    }, [beforeFocus, props.focus, props.comments, comments.length]);
+    }, [
+      beforeFocus,
+      props.focus,
+      props.comments,
+      comments.length,
+      remainingProcess
+    ]);
 
     return (
       <div

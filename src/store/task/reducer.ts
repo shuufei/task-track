@@ -726,6 +726,7 @@ export const reducer = (state: State = initState, action: Actions) => {
           task.subTaskUuids != null
             ? [...task.subTaskUuids, subTask.uuid]
             : [subTask.uuid];
+        draft.focusUuid = subTask.uuid;
       });
     case 'IMPORT_SECTIONS':
       return produce(state, draft => {
