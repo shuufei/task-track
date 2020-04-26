@@ -26,13 +26,25 @@ export const TaskListContainer: React.FC<Props> = props => {
   const [{ isOver }, connectTaskDrop] = useDrop({
     accept: DRAG_TYPE_TASK,
     drop: (v: DragObjectType) => {
-      dispatch(
-        actionCreator.task.moveTask({
-          draggedTaskUuid: v.uuid,
-          droppedTaskUuid: lastUuid,
-          direction: 'next'
-        })
-      );
+      if (sectionId == null) {
+        return;
+      }
+      if (lastUuid == null) {
+        dispatch(
+          actionCreator.task.insertFirstTaskOfSection({
+            draggedTaskUuid: v.uuid,
+            sectionId
+          })
+        );
+      } else {
+        dispatch(
+          actionCreator.task.moveTask({
+            draggedTaskUuid: v.uuid,
+            droppedTaskUuid: lastUuid,
+            direction: 'next'
+          })
+        );
+      }
     },
     collect: monitor => ({
       isOver: !!monitor.isOver()
@@ -60,7 +72,7 @@ export const TaskListContainer: React.FC<Props> = props => {
         <div
           ref={taskDropRef}
           css={css`
-            height: 12px;
+            height: 24px;
             width: 100%;
             margin-top: 4px;
             background-color: ${colors.transparent};

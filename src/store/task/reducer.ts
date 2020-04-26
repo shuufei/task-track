@@ -834,6 +834,34 @@ export const reducer = (state: State = initState, action: Actions) => {
       return produce(state, draft => {
         draft.undoState = {};
       });
+    case 'INSERT_FIRST_TASK_OF_SECTION':
+      return produce(state, draft => {
+        const task = draft.tasks.find(
+          v => v.uuid === action.payload.draggedTaskUuid
+        );
+        if (task == null) {
+          return;
+        }
+        task.sectionId = action.payload.sectionId;
+        if (task.parentTaskUuid != null) {
+          const parent = draft.tasks.find(
+            v => v.parentTaskUuid === task.parentTaskUuid
+          );
+          if (parent == null) {
+            return;
+          }
+          removeSubTaskFromParent(draft.tasks, task.parentTaskUuid, task.uuid);
+          recursiveInvokeFnParentTask(draft.tasks, parent!, parent => {
+            updateParentTimesec(draft.tasks, parent);
+          });
+          task.parentTaskUuid = undefined;
+        }
+        if (task.subTaskUuids != null) {
+          recursiveInvokeFnChildTask(draft.tasks, task, child => {
+            child.sectionId = action.payload.sectionId;
+          });
+        }
+      });
     default:
       return state;
   }

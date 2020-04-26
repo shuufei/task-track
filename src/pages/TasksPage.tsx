@@ -44,7 +44,7 @@ export const TasksPage: React.FC = () => {
               sectionId={v}
               isFirst={i === 0}
               customCss={css`
-                margin-top: ${i === 0 ? '0' : '12px'};
+                margin-top: ${i === 0 ? '0' : '24px'};
               `}
             />
           </SectionIdContext.Provider>

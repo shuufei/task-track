@@ -93,6 +93,10 @@ export interface UndoAction extends Action {
 export interface UndoClearAction extends Action {
   type: 'UNDO_CLEAR';
 }
+export interface InsertFirstTaskOfSectionAction extends Action {
+  type: 'INSERT_FIRST_TASK_OF_SECTION';
+  payload: { sectionId: string; draggedTaskUuid: string };
+}
 export type Actions =
   | AddTaskAction
   | AddTaskToSectionAction
@@ -114,7 +118,8 @@ export type Actions =
   | SetSectionUndoStateAction
   | SetCommentUndoStateAction
   | UndoAction
-  | UndoClearAction;
+  | UndoClearAction
+  | InsertFirstTaskOfSectionAction;
 
 /** Action Creators */
 export const addTask = (payload: AddTaskAction['payload']): AddTaskAction => ({
@@ -217,6 +222,12 @@ export const undo = (): UndoAction => ({
 export const undoClear = (): UndoClearAction => ({
   type: 'UNDO_CLEAR'
 });
+export const insertFirstTaskOfSection = (
+  payload: InsertFirstTaskOfSectionAction['payload']
+): InsertFirstTaskOfSectionAction => ({
+  type: 'INSERT_FIRST_TASK_OF_SECTION',
+  payload
+});
 export const actionCreator = {
   addTask,
   addTaskToSection,
@@ -238,5 +249,6 @@ export const actionCreator = {
   setSectionUndoState,
   setCommentUndoState,
   undo,
-  undoClear
+  undoClear,
+  insertFirstTaskOfSection
 };
