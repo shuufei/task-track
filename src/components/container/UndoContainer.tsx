@@ -18,9 +18,9 @@ export const UndoContainer: React.FC = () => {
   const undoState = useSelector((state: RootState) => state.task.undoState);
   const dispatch = useDispatch();
   const existUndoState =
-    undoState.section != null ||
-    undoState.task != null ||
-    undoState.comment != null;
+    undoState?.section != null ||
+    undoState?.task != null ||
+    undoState?.comment != null;
 
   const setUndoTimeout = useCallback(
     () => {
